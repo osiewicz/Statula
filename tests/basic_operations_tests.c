@@ -44,28 +44,28 @@ Test(median,median3)
 Test(mode,mode0)
 {
   double t0[7]={0};
-  double* out;
+  double* out=malloc(sizeof(double));
   cr_assert(mode(t0,1,out)==1);
   cr_assert(*out==0.0);
 }
 Test(mode,mode1)
 {
-  double t1[3]={1.3,0,1.3};
-  double* out;
+  double t1[3]={0,1.3,1.3};
+  double* out=malloc(sizeof(double));
   cr_assert(mode(t1,3,out)==1);
   cr_assert(*out==1.3);
 }
 Test(mode,mode2)
 {
   double t2[4]={1.7,0,1.7,0};
-  double* out;
+  double* out=malloc(sizeof(double));
   cr_assert(mode(t2,4,out)==-1);
 
 }
 Test(mode,mode3)
 {
   double t3[10]={13934.88665,7.0,3.0,13.5,3.4,-5.3,1.2,-7.0,888.5,17.0};
-  double* out;
+  double* out=malloc(sizeof(double));
   cr_assert(mode(t3,10,out)==-1);
 }
 Test(range,range0)

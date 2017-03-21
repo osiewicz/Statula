@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "basic_operations.h"
+#include <stdio.h>
 static int compare (const void * a, const void * b)
 {
     double _a = *(double*)a;
@@ -32,13 +33,12 @@ int mode(double* array, int el_count,double* output)
 {
   assert(el_count>0);
   double max_value=0;
-  int max_count=0,i,j,mode_count=0;
+  int max_count=0,i,j,mode_count=1;
+  qsort(array,el_count,sizeof(double),compare);
   for(i=0;i<el_count;i++){
     int count=0;
-    for(j=i+1;j<el_count;j++){
-      if(array[j]==array[i])
-        ++count;
-    }
+    for(j=i+1;array[j]==array[i]&&j<el_count;j++);
+    count=j-i;
     if(count>max_count){
       mode_count=1;
       max_count=count;
@@ -46,9 +46,11 @@ int mode(double* array, int el_count,double* output)
     }
     else if(count==max_count)
       mode_count++;
+        i=j-1;
   }
-  if(mode_count==1)
+  if(mode_count==1){
     *output=max_value;
+  }
   return mode_count==1?1:-1;
 }
 int range(double* array,int el_count,double *output)

@@ -2,15 +2,29 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-
+FILE* check_lang_file(char*);
 
 const char **strings(char *language)
 {
   static char *(text)[15];
   FILE *fp;
+  fp=check_lang_file(language);
   size_t t=100;
   int i;
   char *newline_char;
+
+  for(i=0;!feof(fp);i++){
+    if(getline(&(text)[i],&t,fp)>0){
+      newline_char=strpbrk(text[i],"\n");
+      *newline_char=0;
+      continue;
+    }
+  }
+  return (const char**)text;
+}
+FILE* check_lang_file(char* language)
+{
+  FILE* fp;
   if(strcmp(language,"en-gb")==0){
     if( access( ".en-gb.lang", F_OK ) != -1 ) {
       fp=fopen(".en-gb.lang","r");
@@ -34,21 +48,5 @@ const char **strings(char *language)
     " whole package at https://github.com/41r0/TicTacToe-C\n");
     exit(0);
   }
-
-  for(i=0;!feof(fp);i++){
-    if(getline(&(text)[i],&t,fp)>0){
-      newline_char=strpbrk(text[i],"\n");
-      *newline_char=0;
-      continue;
-    }
-  }
-  return (const char**)text;
+  return fp;
 }
-
-/*
- * This part of cose is responsible for loading .lang files
- * (those are written in plain text by the way). It is rather easy to translate
- * this game into your language as all you have to do is to include your
- * translation in check logic above (lines 14-38). I have also removed newlines
- * from strings because they have caused inconsistent behaviour with printf.
- */
