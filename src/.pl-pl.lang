@@ -1,5 +1,6 @@
 Statula v0.1.0
 Wczytywanie danych...
+Ilość liczb:
 Średnia:
 Mediana:
 Dominanta:
@@ -8,4 +9,6 @@ Wariancja:
 Odchylenie standardowe:
 Odchylenie przeciętne:
 Współczynnik zmienności:
-Brak mediany/wiecej niż jedna mediana.
+Kurtoza:
+Asymetria rozkładu empirycznego:
+Brak dominanty/wiecej niż jedna dominanta.
