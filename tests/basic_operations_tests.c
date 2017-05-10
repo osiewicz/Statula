@@ -1,5 +1,5 @@
 #include <criterion/criterion.h>
-#include "../src/basic_operations.h"
+#include "../include/basic_operations.h"
 #include <stdio.h>
 Test(mean,mean0)
 {
@@ -81,4 +81,21 @@ Test(range,range1)
   double *out;
   cr_assert(range(t1,2,out)==1);
   cr_assert(*out==8.5);
+}
+Test(factorial,factorial0)
+{
+	cr_assert(factorial(0)==1);
+}
+Test(factorial,factorial1)
+{
+	cr_assert(factorial(5)==120);
+}
+Test(cdf,cdf0)
+{
+	cr_assert(cdf(0.0)==0.5);
+}
+Test(cdf,cdf1)
+{
+	double epsilon = 0.000000001;
+	cr_assert(abs(cdf(0.5)-0.69146)<epsilon);
 }

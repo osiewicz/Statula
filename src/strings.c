@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-FILE* check_lang_file(char*);
+#include "strings.h"
 
 const char **strings(char *language)
 {
@@ -45,7 +45,7 @@ FILE* check_lang_file(char* language)
     }
   } else{
     printf("Your package is corrupted! Please consider redownloading"
-    " whole package at https://github.com/41r0/TicTacToe-C\n");
+    " whole package at https://github.com/PiotrOsiewicz/Statula\n");
     exit(0);
   }
   return fp;

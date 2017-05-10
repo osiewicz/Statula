@@ -1,8 +1,4 @@
-#include "basic_operations.h"
 #include "medium_operations.h"
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
 int central_moment(double* arr,int el_count,double* output,int degree)
 {
   assert(el_count>0);
