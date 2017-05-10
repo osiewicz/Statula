@@ -36,7 +36,7 @@ int coefficient_of_variation(double* arr, int el_count,double* output)
   standard_deviation(arr,el_count,std_deviation);
   double mean_=mean(arr,el_count);
   if(mean_==0){
-    *output==0;
+    *output=0;
     return -1;
   }
   (*output)=(*std_deviation)/mean_*100;
