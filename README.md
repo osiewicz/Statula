@@ -23,7 +23,7 @@ into your terminal. Data should be contained in text file.
 
   * Allow user to specify format in which data should be printed
 
-  * Allow saving results to text file
+  * Allow saving results to text file//Done
 
 *I think help panel should work even if Statula is unable to load strings from file, however I am not quite sure how can I avoid hard-coding
 it into the program itself. 

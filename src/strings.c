@@ -20,6 +20,7 @@ const char **strings(char *language)
       continue;
     }
   }
+  fclose(fp);
   return (const char**)text;
 }
 FILE* check_lang_file(char* language)

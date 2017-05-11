@@ -3,9 +3,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "strings.h"
-
 double* read_data(const char* source,int* num_count);
 void print_help(void);
+
+static int compare (const void * a, const void * b)
+{
+    double _a = *(double*)a;
+    double _b = *(double*)b;
+    if(_a < _b) return -1;
+    else if(_a == _b) return 0;
+    else return 1;
+}
 
 int main(int argc,char** argv)
 {
@@ -63,7 +71,8 @@ int main(int argc,char** argv)
   }
   const char** text=strings(language);
   arr=read_data(source_file,num_count);
-  
+
+  qsort(arr,*num_count,sizeof(double),compare);
   mean_val=mean(arr,*num_count);
   median_val=median(arr,*num_count);
   mode_check=mode(arr,*num_count,&mode_val);
@@ -84,17 +93,23 @@ int main(int argc,char** argv)
 		  mean_absolute_deviation_val,text[10],coefficient_of_variation_val,text[11],kurtosis_val,text[12],skewness_val); 
   if(file_save_check==1){
 	save_file = fopen(destination_file,"w");
-	fprintf(save_file,"%s\n%s\n%s %d\n%s %f\n%s %f\n%s ",text[0],text[1],text[2],*num_count,text[3],mean_val,text[4],median_val,text[5]);
-	if(mode_check==-1)
-    	  fprintf(save_file,"%s\n",text[13]);
-  	else
- 	  fprintf(save_file,"%f\n",mode_val);
-   	fprintf(save_file,"%s %f\n%s %f\n%s %f\n%s %f\n%s %.2f\%\n%s %f\n%s %f\n",text[6],range_val,text[7],central_moment_val,text[8],standard_deviation_val,text[9],
-		  mean_absolute_deviation_val,text[10],coefficient_of_variation_val,text[11],kurtosis_val,text[12],skewness_val); 
-	fclose(save_file);
+	if(save_file){
+		fprintf(save_file,"%s\n%s\n%s %d\n%s %f\n%s %f\n%s ",text[0],text[1],text[2],*num_count,text[3],mean_val,text[4],median_val,text[5]);
+		if(mode_check==-1)
+    	  		fprintf(save_file,"%s\n",text[13]);
+  		else
+ 		        fprintf(save_file,"%f\n",mode_val);
+   		fprintf(save_file,"%s %f\n%s %f\n%s %f\n%s %f\n%s %.2f\%\n%s %f\n%s %f\n",text[6],range_val,text[7],central_moment_val,text[8],standard_deviation_val,text[9], mean_absolute_deviation_val,text[10],coefficient_of_variation_val,text[11],kurtosis_val,text[12],skewness_val); 
+		fclose(save_file);
+	}
+	else
+		printf("Error opening a file for saving!");
   }
   free(arr);
-  
+  free(destination_file);
+  free(value);
+  free(num_count);
+
   return 0;
 }
 

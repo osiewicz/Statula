@@ -50,6 +50,7 @@ int kurtosis(double* arr,int el_count,double* output)
   double *std_deviation=malloc(sizeof(double));
   standard_deviation(arr,el_count,std_deviation);
   *output=*c_moment/pow(*std_deviation,4)-3;
+  free(std_deviation);
   free(c_moment);
   return 1;
 }
