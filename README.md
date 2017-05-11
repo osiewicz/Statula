@@ -11,7 +11,7 @@ In order to perform analysis, just type:
 ./statula dataset_filename
 into your terminal. Data should be contained in text file.
 
-_###TODO_:
+### _TODO_:
 
   * Mathematical statistics
 

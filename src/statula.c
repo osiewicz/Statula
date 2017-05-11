@@ -9,14 +9,23 @@ void print_help(void);
 
 int main(int argc,char** argv)
 {
-  double *arr;
-  int* num_count=malloc(sizeof(int));
-  double* value=malloc(sizeof(double));
-  char *filename=malloc(sizeof(char)*100);
+  char *destination_file=malloc(sizeof(char)*150);
+  char *source_file=malloc(sizeof(char)*150);
   char *language=malloc(sizeof(char)*8);
-  filename="data";
+  char mode_check=0;
+  char file_save_check=0;
+  FILE* save_file=NULL;
+  double *arr;
+  double mean_val, median_val, mode_val, range_val,central_moment_val, standard_deviation_val,mean_absolute_deviation_val,
+	  coefficient_of_variation_val,kurtosis_val,skewness_val; 
+  double* value=malloc(sizeof(double));
+  int* num_count=malloc(sizeof(int));
+
+  source_file="data";
   language="en-gb";
-    *num_count=0;
+  *num_count=0;
+  memset(destination_file,0,150);
+  
   if(argc>1){//Check for starting parameters
     for(int i=1;i<argc;i++){
       if(strncmp(argv[i],"--",2)==0){
@@ -27,18 +36,25 @@ int main(int argc,char** argv)
         }
 	else if(strcmp(argv[i],"--o")==0&&argc-i>1){
           if(strncmp(argv[i+1],"--",2)!=0)
-            filename=argv[++i];
+            source_file=argv[++i];
         }
         else if(strcmp(argv[i],"--l")==0&&argc-i>1){
           if(strncmp(argv[i+1],"--",2)!=0)
             language=argv[++i];
         }
+	else if(strcmp(argv[i],"--s")==0&&argc-i>1){
+	  if(strncmp(argv[i+1],"--",2)!=0)
+		  destination_file=argv[++i];
+	          file_save_check=1;
+	}
 	else{
 		printf("\nInvalid starting parameter!\n\n");
 		print_help();
 		return -1;
 	}
       }
+      else if(argc==2)
+	      source_file=argv[1];
       else{
 	      print_help();
 	      return -1;
@@ -46,42 +62,44 @@ int main(int argc,char** argv)
     }
   }
   const char** text=strings(language);
- 
-  arr=read_data(filename,num_count);
-
-  printf("%s\n%s\n%s %d\n%s %f\n%s %f\n%s ",text[0],text[1],text[2],*num_count,text[3],
-  mean(arr,*num_count),text[4],median(arr,*num_count),text[5]);
+  arr=read_data(source_file,num_count);
   
-  if(  mode(arr,*num_count,value)==-1)
-    printf("%s\n%s ",text[13],text[6]);
+  mean_val=mean(arr,*num_count);
+  median_val=median(arr,*num_count);
+  mode_check=mode(arr,*num_count,&mode_val);
+  range(arr,*num_count,&range_val);
+  central_moment(arr,*num_count,&central_moment_val,2);
+  standard_deviation(arr,*num_count,&standard_deviation_val);
+  mean_absolute_deviation(arr,*num_count,&mean_absolute_deviation_val);
+  coefficient_of_variation(arr,*num_count,&coefficient_of_variation_val);
+  kurtosis(arr,*num_count,&kurtosis_val);
+  skewness(arr,*num_count,&skewness_val);
+  
+  printf("%s\n%s\n%s %d\n%s %f\n%s %f\n%s ",text[0],text[1],text[2],*num_count,text[3],mean_val,text[4],median_val,text[5]);
+  if(mode_check==-1)
+    printf("%s\n",text[13]);
   else
-    printf("%f\n%s ",*value,text[6]);
-  
-  range(arr,*num_count,value);
-  printf("%f\n%s ",*value,text[7]);
-  
-  central_moment(arr,*num_count,value,2);
-  printf("%f\n%s ",*value,text[8]);
-  
-  standard_deviation(arr,*num_count,value);
-  printf("%f\n%s ",*value,text[9]);
-  
-  mean_absolute_deviation(arr,*num_count,value);
-  printf("%f\n%s ",*value,text[10]);
-  
-  coefficient_of_variation(arr,*num_count,value);
-  printf("%.2f\%\n%s",*value,text[11]);
-  
-  kurtosis(arr,*num_count,value);
-  printf("%f\n%s",*value,text[12]);
-  
-  skewness(arr,*num_count,value);
-  printf("%f\n",*value);
-
+    printf("%f\n",mode_val);
+  printf("%s %f\n%s %f\n%s %f\n%s %f\n%s %.2f\%\n%s %f\n%s %f\n",text[6],range_val,text[7],central_moment_val,text[8],standard_deviation_val,text[9],
+		  mean_absolute_deviation_val,text[10],coefficient_of_variation_val,text[11],kurtosis_val,text[12],skewness_val); 
+  if(file_save_check==1){
+	save_file = fopen(destination_file,"w");
+	fprintf(save_file,"%s\n%s\n%s %d\n%s %f\n%s %f\n%s ",text[0],text[1],text[2],*num_count,text[3],mean_val,text[4],median_val,text[5]);
+	if(mode_check==-1)
+    	  fprintf(save_file,"%s\n",text[13]);
+  	else
+ 	  fprintf(save_file,"%f\n",mode_val);
+   	fprintf(save_file,"%s %f\n%s %f\n%s %f\n%s %f\n%s %.2f\%\n%s %f\n%s %f\n",text[6],range_val,text[7],central_moment_val,text[8],standard_deviation_val,text[9],
+		  mean_absolute_deviation_val,text[10],coefficient_of_variation_val,text[11],kurtosis_val,text[12],skewness_val); 
+	fclose(save_file);
+  }
   free(arr);
   
   return 0;
 }
+
+/*** file manipulation ***/
+
 double* read_data(const char* source,int* num_count)
 {
   FILE *fp;
@@ -104,6 +122,7 @@ double* read_data(const char* source,int* num_count)
     exit(1);
   }
 }
+
 void print_help(void)
 {
   printf("Starting parameters:\n\
