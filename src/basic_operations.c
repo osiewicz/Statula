@@ -1,8 +1,4 @@
-#include <assert.h>
 #include "basic_operations.h"
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 static int compare (const void * a, const void * b)
 {
@@ -79,17 +75,9 @@ long long int factorial(int n){
 	return fact_iter(1,n,1);
 }
 /*** mathematical statistics - basic tools ***/
-static double err_func(double x){
-	double multiplier = 2/sqrt(M_PI);
-	double result=0;
-	for(int i=0;i<18;i++){
-		result+=(pow(-1,i)*pow(x,2*i+1)/((2*i+1)*factorial(i)));
-	}
-	return result*multiplier;
-}
 
 double cdf(double x) //stands for: cumulative distribution function
 {
-	return 0.5*(1+err_func(x/sqrt(2)));
+	return 0.5*(1+erf(x/sqrt(2)));
 }
 

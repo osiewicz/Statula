@@ -13,5 +13,4 @@ int range(double* array,int el_count,double *output);
 static long long int fact_iter(int counter,const int target,long long int accumulator);
 long long int factorial(int n);
 double cdf(double x);
-static double err_func(double x);
 #endif
