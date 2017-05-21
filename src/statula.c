@@ -106,7 +106,6 @@ int main(int argc,char** argv)
 		printf("Error opening a file for saving!");
   }
   free(arr);
-  free(destination_file);
   free(value);
   free(num_count);
 
