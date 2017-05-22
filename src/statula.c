@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include "strings.h"
 
-
-
 int init_dataset(struct dataset *set,const char *source);
 int free_dataset(struct dataset *set);
+int compute_dataset(struct dataset *set);
+int print_dataset(struct dataset *set,FILE* stream,const char **text);
 double *read_data(const char *source,int *num_count);
 void print_help(void);
 
@@ -25,21 +25,11 @@ int main(int argc,char **argv)
 	char	*destination_file = malloc(sizeof(char)*150);
 	char	*source_file = malloc(sizeof(char)*150);
 	char	*language = malloc(sizeof(char)*8);
-	char	mode_check = 0;
 	char	file_save_check = 0;
 	FILE	*save_file = NULL;
-	double	*arr;
-	double	mean_val, median_val, mode_val, range_val,central_moment_val, 
-		standard_deviation_val,mean_absolute_deviation_val,
-		coefficient_of_variation_val,kurtosis_val,skewness_val; 
-	double	*value = malloc(sizeof(double));
-	int	*num_count = malloc(sizeof(int));
-//	struct dataset *p = malloc(sizeof(struct dataset));
-//	printf("%d\n",	init_dataset(p,"01-big"));
-//	free_dataset(p);
+
 	source_file = "data";
 	language = "en-gb";
-	*num_count = 0;
 	memset(destination_file,0,150);
   
 	if(argc>1){//Check for starting parameters
@@ -72,48 +62,24 @@ int main(int argc,char **argv)
 			}
 		}
 	}
+	struct dataset *set = malloc(sizeof(struct dataset));
+	init_dataset(set,source_file);
+	compute_dataset(set);
+	
 	const char **text = strings(language);
-	arr = read_data(source_file,num_count);
+	print_dataset(set,stdout,text);
 
-	qsort(arr,*num_count,sizeof(double),compare);
-	mean_val = mean(arr,*num_count);
-	median_val = median(arr,*num_count);
-	mode_check = mode(arr,*num_count,&mode_val);
-	range(arr,*num_count,&range_val);
-	central_moment(arr,*num_count,&central_moment_val,2);
- 	standard_deviation(arr,*num_count,&standard_deviation_val);
-	mean_absolute_deviation(arr,*num_count,&mean_absolute_deviation_val);
-	coefficient_of_variation(arr,*num_count,&coefficient_of_variation_val);
-	kurtosis(arr,*num_count,&kurtosis_val);
-	skewness(arr,*num_count,&skewness_val);
-  
-	printf("%s\n%s\n%s %d\n%s %f\n%s %f\n%s ",text[0],text[1],text[2],*num_count,text[3],mean_val,text[4],median_val,text[5]);
-	if(mode_check==-1)
-		printf("%s\n",text[13]);
-	else
-		printf("%f\n",mode_val);
-	printf("%s %f\n%s %f\n%s %f\n%s %f\n%s %.2f\%\n%s %f\n%s %f\n",text[6],range_val,text[7],central_moment_val,text[8],standard_deviation_val,text[9],
-		mean_absolute_deviation_val,text[10],coefficient_of_variation_val,text[11],kurtosis_val,text[12],skewness_val); 
 	if(file_save_check==1){
 		save_file = fopen(destination_file,"w");
 		if(save_file){
-			fprintf(save_file,"%s\n%s\n%s %d\n%s %f\n%s %f\n%s ",text[0],text[1],text[2],*num_count,text[3],mean_val,text[4],median_val,text[5]);
-			if(mode_check==-1)
-				fprintf(save_file,"%s\n",text[13]);
-			else
-				fprintf(save_file,"%f\n",mode_val);
-			fprintf(save_file,"%s %f\n%s %f\n%s %f\n%s %f\n%s %.2f\%\n%s %f\n%s %f\n",
-				text[6],range_val,text[7],central_moment_val,text[8],standard_deviation_val,
-				text[9], mean_absolute_deviation_val,text[10],coefficient_of_variation_val,
-				text[11],kurtosis_val,text[12],skewness_val); 
+			print_dataset(set,save_file,text);
 			fclose(save_file);
 		} else {
 			printf("Error opening a file for saving!");
 		}
 	}
-	free(arr);
-	free(value);
-	free(num_count);
+	
+	free_dataset(set);
 
 	return 0;
 }
@@ -122,9 +88,9 @@ int main(int argc,char **argv)
 
 int init_dataset(struct dataset *set,const char *source)
 {
-	set->number_count = malloc(sizeof(int));
+	set->number_count = 0;
 	set->is_mode_present = 0;
-	set->numbers = read_data(source,set->number_count);
+	set->numbers = read_data(source,&(set->number_count));
 	set->mean = malloc(sizeof(double));
 	set->median = malloc(sizeof(double));
 	set->mode = malloc(sizeof(double));
@@ -145,7 +111,6 @@ int init_dataset(struct dataset *set,const char *source)
 
 int free_dataset(struct dataset *set)
 {
-	free(set->number_count);
 	free(set->numbers);
 	free(set->mean);
 	free(set->median);
@@ -157,6 +122,38 @@ int free_dataset(struct dataset *set)
 	free(set->coefficient_of_variation);
 	free(set->kurtosis);
 	free(set->skewness);
+	return 1;
+}
+
+int compute_dataset(struct dataset *set)
+{
+	qsort(set->numbers,(set->number_count),sizeof(double),compare);
+	mean(set);
+	median(set);
+	mode(set);
+	range(set);
+	central_moment(set,2);
+	standard_deviation(set);
+	mean_absolute_deviation(set);
+	coefficient_of_variation(set);
+	kurtosis(set);
+	skewness(set);
+	return 1;
+}
+
+int print_dataset(struct dataset *set,FILE* stream,const char** text)
+{
+	fprintf(stream,"%s\n%s\n%s %d\n%s %f\n%s %f\n%s ",text[0],text[1],text[2],
+			set->number_count,text[3],*(set->mean),text[4],*(set->median),text[5]);
+	if(set->is_mode_present!=1)
+		fprintf(stream,"%s\n",text[13]);
+	else
+		fprintf(stream,"%f\n",*(set->mode));
+	fprintf(stream,"%s %f\n%s %f\n%s %f\n%s %f\n%s %.2f\%\n%s %f\n%s %f\n",
+		text[6],*(set->range),text[7],*(set->central_moment),text[8],*(set->standard_deviation),
+		text[9], *(set->mean_absolute_deviation),text[10],*(set->coefficient_of_variation),
+		text[11],*(set->kurtosis),text[12],*(set->skewness)); 
+
 	return 1;
 }
 /*** file manipulation ***/
@@ -188,6 +185,7 @@ void print_help(void)
 {
 	printf("Starting parameters:\n\
 	--o * - open specified file\n\
+	--s * - save result to specified file\n\
 	--l pl-pl/en-gb - change interface language\n\
 	--help / --h - show help page\n\n");
 }

@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 struct dataset{
-	int	*number_count;
+	int	number_count;
 	int	is_mode_present;
 	double 	*numbers;
 	double	*mean;
