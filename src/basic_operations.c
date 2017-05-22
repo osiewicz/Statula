@@ -2,59 +2,65 @@
 
 /*** elementary statistical operations ***/
 
-double mean(double *array,int el_count)
+int mean(struct dataset *set)
 {
 	assert(el_count>0);
 	double sum=0;
-	for(int i=0;i<el_count;i++){
-		sum+=array[i];
+	for(int i=0;i<set->number_count;i++){
+		sum+=set->numbers[i];
 	}
-	return sum/el_count;
+	set->mean=sum/set->number_countl
+	return el_count>0?1:0;
 }
 
-double median(double *array,int el_count)
+int median(struct dataset *set)
 {
-	assert(el_count>0);
-	if(el_count%2==0)
-		return (array[(el_count)/2]+array[(el_count)/2-1])/2;
-	return array[(el_count-1)/2];
+	assert(set->number_count>0);
+	if(set->number_count%2==0)
+		set->median=(set->numbers[(set->number_count)/2]+set->numbers[(set->number_count)/2-1])/2;
+	else set->numbers[(set->number_count-1)/2];
+	return set->number_count>0?1:0;
 }
 
-int mode(double *array, int el_count,double *output)
+int mode(struct dataset *set)
 {
-	assert(el_count>0);
+	assert(set->number_count>0);
 	double max_value=0;
 	int max_count=0,i,j,mode_count=1;
-	for(i=0;i<el_count;i++){
+	for(i=0;i<set->number_count;i++){
 		int count=0;
-		for(j=i+1;array[j]==array[i]&&j<el_count;j++);
+		for(j=i+1;set->numbers[j]==set->numbers[i]&&j<set->number_count;j++);
 		count=j-i;
 		if(count>max_count){
 			mode_count=1;
 			max_count=count;
-			max_value=array[i];
+			max_value=set->numbers[i];
 		} else if(count==max_count) {
 			mode_count++;
 			i=j-1;
 		}
 	}
 	if(mode_count==1){
-		*output=max_value;
+		set->mode=max_value;	
+		set->is_mode_present=1;
+	} else{
+		set->mode = 0;
+		set->is_mode_present=0;
 	}
-	return mode_count==1?1:-1;
+	return mode_count==1?1:0;
 }
 
-int range(double *array,int el_count,double *output)
+int range(struct dataset *set)
 {
-	assert(el_count>0);
-	double max=array[0],min=array[0];
+	assert(set->number_count>0);
+	double max=set->numbers[0],min=set->numbers[0];
 	for(int i=0;i<el_count;i++){
-		if(array[i]>max)
-			max=array[i];
-		if(array[i]<min)
-			min=array[i];
+		if(set->numbers[i]>max)
+			max=set->numbers[i];
+		if(set->numbers[i]<min)
+			min=set->numbers[i];
 	}
-	*output=max-min;
+	set->range=max-min;	
 	return 1;
 }
 

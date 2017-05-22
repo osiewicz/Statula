@@ -4,21 +4,7 @@
 #include <stdlib.h>
 #include "strings.h"
 
-struct dataset{
-	int	*number_count;
-	int	is_mode_present;
-	double 	*numbers;
-	double	*mean;
-	double	*median;
-	double	*mode;
-	double	*range;
-	double	*central_moment;
-	double	*standard_deviation;
-	double	*mean_absolute_deviation;
-	double	*coefficient_of_variation;
-	double	*kurtosis;
-	double	*skewness;
-};
+
 
 int init_dataset(struct dataset *set,const char *source);
 int free_dataset(struct dataset *set);
