@@ -4,6 +4,24 @@
 #include <stdlib.h>
 #include "strings.h"
 
+struct dataset{
+	int	*number_count;
+	int	is_mode_present;
+	double 	*numbers;
+	double	*mean;
+	double	*median;
+	double	*mode;
+	double	*range;
+	double	*central_moment;
+	double	*standard_deviation;
+	double	*mean_absolute_deviation;
+	double	*coefficient_of_variation;
+	double	*kurtosis;
+	double	*skewness;
+};
+
+int init_dataset(struct dataset *set,const char *source);
+int free_dataset(struct dataset *set);
 double *read_data(const char *source,int *num_count);
 void print_help(void);
 
@@ -18,19 +36,21 @@ static int compare (const void  *a, const void  *b)
 
 int main(int argc,char **argv)
 {
-	char *destination_file = malloc(sizeof(char)*150);
-	char *source_file = malloc(sizeof(char)*150);
-	char *language = malloc(sizeof(char)*8);
-	char mode_check = 0;
-	char file_save_check = 0;
-	FILE *save_file = NULL;
-	double *arr;
-	double mean_val, median_val, mode_val, range_val,central_moment_val, 
+	char	*destination_file = malloc(sizeof(char)*150);
+	char	*source_file = malloc(sizeof(char)*150);
+	char	*language = malloc(sizeof(char)*8);
+	char	mode_check = 0;
+	char	file_save_check = 0;
+	FILE	*save_file = NULL;
+	double	*arr;
+	double	mean_val, median_val, mode_val, range_val,central_moment_val, 
 		standard_deviation_val,mean_absolute_deviation_val,
 		coefficient_of_variation_val,kurtosis_val,skewness_val; 
-	double *value = malloc(sizeof(double));
-	int *num_count = malloc(sizeof(int));
-
+	double	*value = malloc(sizeof(double));
+	int	*num_count = malloc(sizeof(int));
+//	struct dataset *p = malloc(sizeof(struct dataset));
+//	printf("%d\n",	init_dataset(p,"01-big"));
+//	free_dataset(p);
 	source_file = "data";
 	language = "en-gb";
 	*num_count = 0;
@@ -112,6 +132,47 @@ int main(int argc,char **argv)
 	return 0;
 }
 
+/*** dataset manipulation ***/
+
+int init_dataset(struct dataset *set,const char *source)
+{
+	set->number_count = malloc(sizeof(int));
+	set->is_mode_present = 0;
+	set->numbers = read_data(source,set->number_count);
+	set->mean = malloc(sizeof(double));
+	set->median = malloc(sizeof(double));
+	set->mode = malloc(sizeof(double));
+	set->range = malloc(sizeof(double));
+	set->central_moment = malloc(sizeof(double));
+	set->standard_deviation = malloc(sizeof(double));
+	set->mean_absolute_deviation = malloc(sizeof(double));
+	set->coefficient_of_variation = malloc(sizeof(double));
+	set->kurtosis = malloc(sizeof(double));
+	set->skewness = malloc(sizeof(double));
+	
+	if(!set->number_count||!set->numbers||!set->mean||!set->median||!set->mode||!set->range
+		||!set->central_moment||!set->standard_deviation||!set->mean_absolute_deviation
+		||!set->coefficient_of_variation||!set->kurtosis||!set->skewness)
+		return 0;
+	return 1;
+}
+
+int free_dataset(struct dataset *set)
+{
+	free(set->number_count);
+	free(set->numbers);
+	free(set->mean);
+	free(set->median);
+	free(set->mode);
+	free(set->range);
+	free(set->central_moment);
+	free(set->standard_deviation);
+	free(set->mean_absolute_deviation);
+	free(set->coefficient_of_variation);
+	free(set->kurtosis);
+	free(set->skewness);
+	return 1;
+}
 /*** file manipulation ***/
 
 double *read_data(const char* source,int* num_count)
@@ -139,8 +200,8 @@ double *read_data(const char* source,int* num_count)
 
 void print_help(void)
 {
-  printf("Starting parameters:\n\
-  --o * - open specified file\n\
-  --l pl-pl/en-gb - change interface language\n\
-  --help / --h - show help page\n\n");
+	printf("Starting parameters:\n\
+	--o * - open specified file\n\
+	--l pl-pl/en-gb - change interface language\n\
+	--help / --h - show help page\n\n");
 }
