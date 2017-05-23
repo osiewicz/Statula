@@ -1,6 +1,4 @@
-#ifndef BASICOPERATIONS
-#define BASICOPERATIONS
-
+#pragma once
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -29,4 +27,3 @@ int	range(struct dataset *set);
 static long long int fact_iter(int counter,const int target,long long int accumulator);
 long long int factorial(int n);
 double cdf(double x);
-#endif

@@ -8,10 +8,10 @@ LDI =../lib
 
 LIBS=-lm -lcriterion
 
-_DEPS = basic_operations.h medium_operations.h 
+_DEPS = basic_operations.h medium_operations.h io.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = basic_operations.o medium_operations.o basic_operations_tests.o medium_operations_tests.o
+_OBJ = tests.o basic_operations.o medium_operations.o dataset.o io.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: %.c $(DEPS)

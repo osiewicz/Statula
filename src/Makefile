@@ -7,10 +7,10 @@ LDI =../lib
 
 LIBS=-lm
 
-_DEPS = basic_operations.h medium_operations.h strings.h 
+_DEPS = basic_operations.h medium_operations.h io.h statula.h dataset.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = statula.o basic_operations.o medium_operations.o strings.o
+_OBJ = statula.o dataset.o basic_operations.o medium_operations.o io.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: %.c $(DEPS)
