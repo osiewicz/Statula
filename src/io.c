@@ -9,7 +9,10 @@ const char **strings(char *language)
 	FILE *fp;
 	size_t t=100;
 	fp=open_lang_file(language);
-
+	if(!fp){
+		printf("Could not open file .%s.lang.\n",language);
+		exit(0);
+	}
 	for(int i=0;!feof(fp);i++){
 		if(getline(&(text)[i],&t,fp)>0){
 			newline_char=strpbrk(text[i],"\n");
@@ -24,27 +27,16 @@ const char **strings(char *language)
 FILE* open_lang_file(char* language)
 {
 	FILE* fp;
-	if(strcmp(language,"en-gb")==0){
-		if( access( ".en-gb.lang", F_OK ) != -1 ) {
-			fp=fopen(".en-gb.lang","r");
-		} else {
-			printf("Language pack for %s is missing!"
-			" Consider using other language packs or download them from"
-			" GitHub repository.",language);
-			exit(0);
-		}
-	} else if(strcmp(language,"pl-pl")==0){
-		if( access( ".pl-pl.lang", F_OK ) != -1 ) {
-			fp=fopen(".pl-pl.lang","r");
-		} else {
-			printf("Language pack for %s is missing!"
-			" Consider using other language packs or download them from"
-			" GitHub repository.",language);
-			exit(0);
-		}
-	} else{
-		printf("Your package is corrupted! Please consider redownloading"
-		" whole package at https://github.com/PiotrOsiewicz/Statula\n");
+	char *filename = malloc(sizeof(char)*(strlen(language)+7));
+	filename[0]='.';
+	memcpy(filename+1,language,strlen(language));
+	strncat(filename+strlen(language),".lang",5);
+	if( access( filename, F_OK ) != -1 ) {
+		fp=fopen(filename,"r");
+	} else {
+		printf("Language pack for %s is missing!"
+		" Consider using other language packs or download them from"
+		" GitHub repository.",language);
 		exit(0);
 	}
 	return fp;
@@ -70,7 +62,7 @@ double *read_data(const char* source,int* num_count)
 		fclose(fp);
 		return numbers;
 	} else {
-		printf("Specified file doesn't exists! Check whether you didn't make an error. Default data filename:data");
+		printf("File \"%s\" could not be found!",source);
 		exit(1);
 	}
 }

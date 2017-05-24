@@ -33,7 +33,6 @@ int init_dataset(struct dataset *set,const char *source)
 int free_dataset(struct dataset *set)
 {
 	free(set->numbers);
-	free(set);
 	return 1;
 }
 
@@ -55,16 +54,16 @@ int compute_dataset(struct dataset *set)
 
 int print_dataset(struct dataset *set,FILE* stream,const char** text)
 {
-	fprintf(stream,"%s\n%s\n%s %d\n%s %f\n%s %f\n%s ",text[0],text[1],text[2],
-			set->number_count,text[3],(set->mean),text[4],(set->median),text[5]);
+	fprintf(stream,"\n--------\n%s %d\n%s %f\n%s %f\n%s ",text[0],
+			set->number_count,text[1],(set->mean),text[2],(set->median),text[3]);
 	if(set->is_mode_present!=1)
-		fprintf(stream,"%s\n",text[13]);
+		fprintf(stream,"%s\n",text[11]);
 	else
 		fprintf(stream,"%f\n",(set->mode));
-	fprintf(stream,"%s %f\n%s %f\n%s %f\n%s %f\n%s %.2f\%\n%s %f\n%s %f\n",
-		text[6],(set->range),text[7],(set->central_moment),text[8],(set->standard_deviation),
-		text[9], (set->mean_absolute_deviation),text[10],(set->coefficient_of_variation),
-		text[11],(set->kurtosis),text[12],(set->skewness));
+	fprintf(stream,"%s %f\n%s %f\n%s %f\n%s %f\n%s %.2f\%\n%s %f\n%s %f\n--------\n",
+		text[4],(set->range),text[5],(set->central_moment),text[6],(set->standard_deviation),
+		text[7], (set->mean_absolute_deviation),text[8],(set->coefficient_of_variation),
+		text[9],(set->kurtosis),text[10],(set->skewness));
 
 	return 1;
 }
