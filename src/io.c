@@ -54,8 +54,8 @@ FILE* open_lang_file(char* language)
 
 double *read_data(const char* source,int* num_count)
 {
-	FILE *fp;
 	if( access( source, F_OK ) != -1 ) {
+		FILE *fp;
 		fp=fopen(source,"r");
 		double dummy;
 		for(int i=0;!feof(fp);i++){
