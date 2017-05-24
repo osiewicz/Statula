@@ -85,7 +85,7 @@ int main(int argc,char **argv)
 	free(set);
 	free(destination_file);
 	free(source_file);
-	free(language);
+//	free(language);
 
 	return 0;
 }
