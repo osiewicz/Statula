@@ -25,7 +25,7 @@ int init_dataset(struct dataset *set,const char *source)
 	set->kurtosis = 0;
 	set->skewness = 0;
 
-	if(!set->numbers)
+	if(!set->numbers || set->number_count <= 0)
 		return 0;
 	return 1;
 }

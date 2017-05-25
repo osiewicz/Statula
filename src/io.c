@@ -48,18 +48,38 @@ double *read_data(const char* source,int* num_count)
 {
 	if( access( source, F_OK ) != -1 ) {
 		FILE *fp;
+		char *buffer = malloc(sizeof(char)*4096);
 		fp=fopen(source,"r");
 		double dummy;
+		size_t size = 8192;
+		char *single_number = NULL;
+		char *test = NULL;
 		for(int i=0;!feof(fp);i++){
-			(*num_count)++;
-			fscanf(fp," %lf ",&dummy);
+			if(getline(&buffer,&size,fp)>0){
+				single_number = buffer; 
+				do{
+					test = single_number;
+					dummy = strtod(single_number,&single_number);
+					if(dummy!=0.0 || strcmp(test,single_number)!=0)
+						(*num_count)++;
+				}while(strcmp(test,single_number)!=0);
+			}
 		}
 		double *numbers=malloc(sizeof(double)*(*num_count));
 		rewind(fp);
-		for(int i=0;!feof(fp);i++){
-			fscanf(fp," %lf ",&numbers[i]);
+		for(int i=0;i<(*num_count) && !feof(fp);){
+			if(getline(&buffer,&size,fp)>0){
+				single_number = buffer;
+				do{
+					test = single_number;
+					dummy = strtod(single_number,&single_number);
+					if(dummy != 0.0 || strcmp(test,single_number)!=0)
+					numbers[i++] = dummy;
+				}while(strcmp(test,single_number)!=0);
+			}
 		}
 		fclose(fp);
+		free(buffer);
 		return numbers;
 	} else {
 		printf("File \"%s\" could not be found!",source);
