@@ -27,7 +27,7 @@ int mode(struct dataset *set)
 	assert(set->number_count > 0);
 	double current_mode = 0;
 	int max_count = 0,j,mode_count = 1;
-	for(int i = 0;i < set->number_count;i++){
+	for(int i = 0;i + max_count < set->number_count;i++){
 		int count = 0;
 		for(j = i+1;j<set->number_count && set->numbers[j] == set->numbers[i];j++);
 		count = j-i;

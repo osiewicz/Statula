@@ -1,6 +1,4 @@
 #include "dataset.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include "io.h"
 #include "statula.h"
 
@@ -24,13 +22,13 @@ int main(int argc,char **argv)
 					if(argc==2)
 						return 0;
 				} else if(argc-i>1 && strcmp(argv[i],"--o")==0) {
-						int t;
+					int t;
 					for(t=i+1;t<argc && strncmp(argv[t],"--",2)!=0 ; t++);
 					file_count += t-i-1;
 					source_file = realloc(source_file,sizeof(char)*t);
-						for(int j=0;j<t-i;j++){
-							source_file[j] = argv[++i];
-						}
+					for(int j=0;j<t-i;j++){
+						source_file[j] = argv[++i];
+					}
 				} else if(argc-i>1 && strcmp(argv[i],"--l") == 0) {
 					if(strncmp(argv[i+1],"--",2)!=0)
 						language = argv[++i];

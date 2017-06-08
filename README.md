@@ -3,7 +3,7 @@
 ***
 
 ### Simple terminal-based program for descriptive statistics
-##### *Current version: 0.1.5*
+##### *Current version: 0.1.6*
 
 Initially developed as a leeway from statistics exam, this small piece of software is supposed to allow quick data analysis of big datasets.
 The main focus of this project is speed.

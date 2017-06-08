@@ -1,12 +1,47 @@
 #include "dataset.h"
 
-static int compare (const void  *a, const void  *b)
+static void quick_sort(double *arr, int elements)
 {
-	double _a = *(double*)a;
-	double _b = *(double*)b;
-	if(_a < _b) return -1;
-	else if(_a == _b) return 0;
-	else return 1;
+	//  public-domain implementation by Darel Rex Finley.
+	const int max_levels = 300;
+	double piv;
+	int beg[max_levels], end[max_levels], i=0, L, R, swap ;
+
+	beg[0]=0;
+	end[0]=elements;
+	while (i>=0) {
+		L=beg[i];
+		R=end[i]-1;
+		if (L<R) {
+			piv=arr[L];
+			while (L<R) {
+				while (arr[R]>=piv && L<R)
+					R--;
+				if (L<R)
+					arr[L++]=arr[R];
+				while (arr[L]<=piv && L<R)
+					L++;
+				if (L<R)
+					arr[R--]=arr[L];
+			}
+			arr[L]=piv;
+			beg[i+1]=L+1;
+			end[i+1]=end[i];
+			end[i]=L;
+			i++;
+      			if (end[i]-beg[i]>end[i-1]-beg[i-1]) {
+				swap=beg[i];
+				beg[i]=beg[i-1];
+				beg[i-1]=swap;
+
+				swap=end[i];
+				end[i]=end[i-1];
+				end[i-1]=swap;
+			}
+		} else {
+			i--;
+		}
+	}
 }
 
 int init_dataset(struct dataset *set,const char *source)
@@ -38,7 +73,7 @@ int free_dataset(struct dataset *set)
 
 int compute_dataset(struct dataset *set)
 {
-	qsort(set->numbers,(set->number_count),sizeof(double),compare);
+	quick_sort(set->numbers,set->number_count);
 	mean(set);
 	median(set);
 	mode(set);
