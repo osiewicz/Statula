@@ -13,7 +13,7 @@ int central_moment(struct dataset *set,int degree)
 		set->central_moment = c_moment;	
 	else if(degree == 4)
 		set->kurtosis = c_moment;
-	return degree > 1 ? 1 : 0;
+	return degree > 1;
 }
 
 int standard_deviation(struct dataset *set)
@@ -49,8 +49,7 @@ int kurtosis(struct dataset *set)
 	central_moment(set,4);
 	if(set->standard_deviation == 0)
 		return 0;
-	else
-		set->kurtosis = set->kurtosis / pow(set->standard_deviation,4) - 3;
+	set->kurtosis = set->kurtosis / pow(set->standard_deviation,4) - 3;
 	return 1;
 }
 
@@ -59,5 +58,5 @@ int skewness(struct dataset *set)
 	if(set->standard_deviation == 0)
 		return 0;
 	set->skewness = 3 * ((set->mean - (set->median)) / (set->standard_deviation));
-	return set->skewness <= 1 && set->skewness >= -1 ? 1 : 0;
+	return set->skewness <= 1 && set->skewness >= -1;
 }

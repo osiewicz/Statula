@@ -14,7 +14,7 @@ int main(int argc,char **argv)
 	source_file[0] = "data";
 	language = "en-gb";
   
-	if(argc>1){//Check for starting parameters
+	if(argc>1){
 		for(int i=1;i<argc;i++){
 			if(strncmp(argv[i],"--",2)==0){
 				if(argc-i>0 && (strcmp(argv[i],"--help")==0||strcmp(argv[i],"--h")==0)){
@@ -83,7 +83,6 @@ int main(int argc,char **argv)
 	free(set);
 	free(destination_file);
 	free(source_file);
-//	free(language);
 
 	return 0;
 }

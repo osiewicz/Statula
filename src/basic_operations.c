@@ -18,7 +18,8 @@ int median(struct dataset *set)
 	assert(set->number_count > 0);
 	if(set->number_count%2 == 0)
 		set->median = (set->numbers[(set->number_count) / 2] + set->numbers[(set->number_count) / 2 - 1]) / 2;
-	else set->median = set->numbers[(set->number_count - 1) / 2];
+	else
+		set->median = set->numbers[(set->number_count - 1) / 2];
 	return set->number_count > 0 ? 1 : 0 ;
 }
 
@@ -58,12 +59,14 @@ int range(struct dataset *set)
 	for(int i = 0;i < set->number_count ; i++){
 		if(set->numbers[i] > max)
 			max = set->numbers[i];
-		if(set->numbers[i] < min)
+		else if(set->numbers[i] < min)
 			min = set->numbers[i];
 	}
-	set->range = max-min;	
+	set->range = fabs(max-min);	
 	return 1;
 }
+
+/*** Peripheral ***/
 
 static long long int fact_iter(int counter,const int target,long long int accumulator)
 {
