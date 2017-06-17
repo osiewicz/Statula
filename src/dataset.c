@@ -44,10 +44,10 @@ static void quick_sort(double *arr, int elements)
 	}
 }
 
-int init_dataset(struct dataset *set,const char *source)
+int init_dataset(struct dataset *set,unsigned int flags, const char *source)
 {
 	set->number_count = 0;
-	set->is_mode_present = 0;
+	set->flags = (flags & ~MODE_PRESENT);
 	set->numbers = read_data(source,&(set->number_count));
 	set->mean = 0;
 	set->median = 0; 
@@ -60,20 +60,26 @@ int init_dataset(struct dataset *set,const char *source)
 	set->kurtosis = 0;
 	set->skewness = 0;
 
-	if(!set->numbers || set->number_count <= 0)
-		return 0;
-	return 1;
+	if(!set->numbers){
+		eprintf("init_dataset: Failed to allocate memory for data: ");
+	}
+			
+	if(set->number_count <= 0){
+		eprintf("init_dataset: Invalid number count:");
+	}
+	return 0;
 }
 
 int free_dataset(struct dataset *set)
 {
 	free(set->numbers);
-	return 1;
+	return 0;
 }
 
 int compute_dataset(struct dataset *set)
 {
-	quick_sort(set->numbers,set->number_count);
+	if((set->flags & SORT) != 0)
+		quick_sort(set->numbers,set->number_count);
 	mean(set);
 	median(set);
 	mode(set);
@@ -84,17 +90,17 @@ int compute_dataset(struct dataset *set)
 	coefficient_of_variation(set);
 	kurtosis(set);
 	skewness(set);
-	return 1;
+	return 0;
 }
 
 int print_dataset(struct dataset *set,FILE* stream,const char** text)
 {
 	fprintf(stream,"\n--------\n%s %d\n%s %f\n%s %f\n%s ",text[0],
 			set->number_count,text[1],(set->mean),text[2],(set->median),text[3]);
-	if(set->is_mode_present!=1)
-		fprintf(stream,"%s\n",text[11]);
-	else
+	if((set->flags & MODE_PRESENT) )
 		fprintf(stream,"%f\n",(set->mode));
+	else
+		fprintf(stream,"%s\n",text[11]);
 	fprintf(stream,"%s %f\n%s %f\n%s %f\n%s %f\n%s %.2f\%\n%s %f\n%s %f\n--------\n",
 		text[4],(set->range),text[5],(set->central_moment),text[6],(set->standard_deviation),
 		text[7], (set->mean_absolute_deviation),text[8],(set->coefficient_of_variation),
