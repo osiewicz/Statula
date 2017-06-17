@@ -32,7 +32,8 @@ In case there is a character that does not meet above demands, all remaining cha
 Following section might come in useful if you plan to familiarize yourself with the code. Macro definitions can be found in header files.
   
   
-**Dataset:**
+**Dataset:**  
+
 |   Bit  |   1  |       0      |
 |:------:|:----:|:------------:|
 | Option | SORT | MODE_PRESENT |  
