@@ -1,5 +1,7 @@
 #include "dataset.h"
 
+static fpn* dataset_parse_default(char* buffer,int* num_count,fpn* numbers);
+
 static void quick_sort(fpn *arr, int elements)
 {
 	//  public-domain implementation by Darel Rex Finley.
@@ -48,7 +50,7 @@ int init_dataset(struct dataset *set,unsigned int flags, const char *source)
 {
 	set->number_count = 0;
 	set->flags = (flags & ~MODE_PRESENT);
-	set->numbers = read_data(source,&(set->number_count),&rdubl);
+	set->numbers = read_data(source,&(set->number_count),&dataset_parse_default);
 	set->mean = 0;
 	set->median = 0; 
 	set->mode = 0; 
@@ -107,4 +109,30 @@ int print_dataset(struct dataset *set,FILE* stream,const char** text)
 		text[9],(set->kurtosis),text[10],(set->skewness));
 
 	return 1;
+}
+
+static fpn *dataset_parse_default(char *buffer,int *num_count,fpn *numbers)
+{	
+	static int memory_exp=1;
+	char	*single_number = buffer;
+	char	*test = NULL;
+	fpn	dummy;
+	fpn	*temporary_pointer = NULL;
+	do{
+		test = single_number;
+		dummy = strtod(single_number,&single_number);
+		if(test != single_number || dummy!=0.0 ){
+			if(memory_exp*BUFFER_SIZE <= (*num_count)){
+				memory_exp*=2;
+				temporary_pointer=realloc(numbers,sizeof(fpn)*BUFFER_SIZE * memory_exp);
+				if(!temporary_pointer){
+					eprintf("read_data: Failed to reallocate memory for data array:");
+				}
+				numbers=temporary_pointer;
+			}
+			numbers[*num_count] = dummy;
+			(*num_count)++;
+		}
+	}while(test != single_number);
+	return (fpn*)numbers;
 }

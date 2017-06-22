@@ -23,7 +23,6 @@ struct dataset{
 
 #define	MODE_PRESENT (1<<0)
 #define	SORT (1<<1)
-#define DOUBLE_PRECISION (1<<2)
 
 #include "operations.h"
 #include "io.h"

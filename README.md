@@ -3,7 +3,7 @@
 ***
 
 ### Simple terminal-based program for descriptive statistics
-##### *Current version: 0.1.8*
+##### *Current version: 0.1.9*
 
 Initially developed as a leeway from statistics exam, this small piece of software is supposed to allow quick data analysis of big datasets.
 The main focus of this project is speed.
@@ -23,8 +23,8 @@ In case there is a character that does not meet above demands, all remaining cha
 **--l**		*Print result using specified language (language file has to be present in the current directory.*  
 **--silent**	*Disable printing to standard output.*  
 **--nosort**	*Disable sorting the input. It results in vast performance improvement at the risk of incorrect results in mode, median and skewness.* **USE WITH CAUTION**
-
-
+**--stdin**	*Read directly from stdin. It is the default behaviour if Statula does not receive any starting parameters. Use EOF combination (which is CTRL+D on most systems) to finish data input.*
+Statula does not receive any starting parameters. Use EOF combination (which is
 *If there is just one string after "./statula" (not starting with "--"), then it shall be used as a default filename for the session.*
 
 *** 
@@ -39,11 +39,12 @@ Following section might come in useful if you plan to familiarize yourself with 
 | Option | SORT | MODE_PRESENT |  
   
   
-**Statula:**
-
-|   Bit  |       1      |        0        |
-|:------:|:------------:|:---------------:|
-| Option | SAVE_TO_FILE | PRINT_TO_STDOUT |
+**Statula:**  
+  
+|   Bit  |   2   |       1      |        0        |
+|:------:|:-----:|:------------:|:---------------:|
+| Option | STDIN | SAVE_TO_FILE | PRINT_TO_STDOUT |
+  
 ***
 #### *TODO*
 

@@ -141,7 +141,10 @@ void print_help(void)
 	--silent	Disable printing to standard output.\n\
 	--nosort	Disable sorting the input.\n\
 			It results in vast performance improvement at the risk of incorrect results\n\
-			in mode, median and skewness. USE WITH CAUTION.\n\n\
+			in mode, median and skewness. USE WITH CAUTION.\n\
+	--stdin		Read directly from stdin.\n\
+			It is the default behaviour if Statula does not receive any starting parameters.\n\
+			Use EOF combination (which is CTRL+D on most systems) to finish data input.\n\n\
 	If there is just one string after \"./statula\" (not starting with \"--\"),\n\
 	then it shall be used as a default filename for the session.\n\n");
 }

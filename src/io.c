@@ -49,31 +49,6 @@ static FILE* open_lang_file(const char* language)
 }
 
 /*** read data from file ***/
-fpn* rdubl(char* buffer,int* num_count,fpn* numbers)
-{	
-	static int memory_exp=1;
-	char	*single_number = buffer;
-	char	*test = NULL;
-	fpn	dummy;
-	fpn	*temporary_pointer = NULL;
-	do{
-		test = single_number;
-		dummy = strtod(single_number,&single_number);
-		if(dummy!=0.0 || test != single_number){
-			if(memory_exp*BUFFER_SIZE <= (*num_count)){
-				memory_exp*=2;
-				temporary_pointer=realloc(numbers,sizeof(fpn)*BUFFER_SIZE * memory_exp);
-				if(!temporary_pointer){
-					eprintf("read_data: Failed to reallocate memory for data array:");
-				}
-				numbers=temporary_pointer;
-			}
-			numbers[*num_count] = dummy;
-			(*num_count)++;
-		}
-	}while(test != single_number);
-	return (fpn*)numbers;
-}
 void *read_data(const char *source,int *num_count,fpn *(*filter)(char *buffer,int* num_count,fpn *numbers))
 {
 	if(  source == NULL || access( source, F_OK ) != -1 ) {
