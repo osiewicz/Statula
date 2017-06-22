@@ -7,10 +7,10 @@ LDI =../lib
 
 LIBS=-lm
 
-_DEPS = basic_operations.h medium_operations.h io.h statula.h dataset.h
+_DEPS = operations.h io.h statula.h dataset.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = statula.o dataset.o basic_operations.o medium_operations.o io.o
+_OBJ = statula.o dataset.o operations.o io.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: %.c $(DEPS)
@@ -19,7 +19,11 @@ $(ODIR)/%.o: %.c $(DEPS)
 statula: $(OBJ)
 	gcc -o $@ $^ $(CFLAGS) $(LIBS)
 
-.PHONY: clean
+.PHONY: clean reduced_precision
+
+reduced_precision: clean
+reduced_precision: CFLAGS+="-DREDUCED_PRECISION"
+reduced_precision: statula
 
 clean:
 	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~

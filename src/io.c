@@ -4,24 +4,30 @@
 
 static FILE* open_lang_file(const char* language);
 
-const char **strings(char *language)
+const char **load_strings(char *language)
 {
-	static char *(text)[MAX_LINE_COUNT];
-	char *newline_char;
-	FILE *fp;
-	size_t max_line_size=100;
-	fp=open_lang_file(language);
-	if(!fp){
-		eprintf("strings: Failed to open file \".%s.lang\":",language);
-	}
-	for(int i=0;i<MAX_LINE_COUNT && !feof(fp);i++){
-		if(getline(&(text)[i],&max_line_size,fp)>0){
-			newline_char=strpbrk(text[i],"\n");
-			*newline_char=0;
+	static int ref_counter = 0;
+	if(ref_counter == 0){
+		static char *(text)[MAX_LINE_COUNT];
+		char *newline_char;
+		FILE *fp;
+		size_t max_line_size=100;
+		fp=open_lang_file(language);
+		if(!fp){
+			eprintf("strings: Failed to open file \".%s.lang\":",language);
 		}
+		for(int i=0;i<MAX_LINE_COUNT && !feof(fp);i++){
+			if(getline(&(text)[i],&max_line_size,fp)>0){
+				newline_char=strpbrk(text[i],"\n");
+				*newline_char=0;
+			}
+		}
+		fclose(fp);
+		ref_counter++;
+		return (const char**)text;
+	} else {
+		eprintf("strings: Attempted reload of local strings!");
 	}
-	fclose(fp);
-	return (const char**)text;
 }
 
 static FILE* open_lang_file(const char* language)
@@ -43,25 +49,47 @@ static FILE* open_lang_file(const char* language)
 }
 
 /*** read data from file ***/
-
-double *read_data(const char* source,int* num_count)
+fpn* rdubl(char* buffer,int* num_count,fpn* numbers)
+{	
+	static int memory_exp=1;
+	char	*single_number = buffer;
+	char	*test = NULL;
+	fpn	dummy;
+	fpn	*temporary_pointer = NULL;
+	do{
+		test = single_number;
+		dummy = strtod(single_number,&single_number);
+		if(dummy!=0.0 || test != single_number){
+			if(memory_exp*BUFFER_SIZE <= (*num_count)){
+				memory_exp*=2;
+				temporary_pointer=realloc(numbers,sizeof(fpn)*BUFFER_SIZE * memory_exp);
+				if(!temporary_pointer){
+					eprintf("read_data: Failed to reallocate memory for data array:");
+				}
+				numbers=temporary_pointer;
+			}
+			numbers[*num_count] = dummy;
+			(*num_count)++;
+		}
+	}while(test != single_number);
+	return (fpn*)numbers;
+}
+void *read_data(const char *source,int *num_count,fpn *(*filter)(char *buffer,int* num_count,fpn *numbers))
 {
-	if( access( source, F_OK ) != -1 ) {
+	if(  source == NULL || access( source, F_OK ) != -1 ) {
 		FILE *fp;
 		char *buffer = malloc(sizeof(char)*BUFFER_SIZE);
 		if(!buffer){
 			eprintf("read_data: Failed to allocate memory for line buffer:");
 		}
-		fp=fopen(source,"r");
-		if(fp){
-			char	*single_number = NULL;
-			char	*test = NULL;
-			double	dummy;
-			double	*temporary_pointer = NULL;
-			double	*numbers;
-			int	memory_exp = 1;
+		if( source == NULL)
+			fp = stdin;
+		else
+			fp=fopen(source,"r");
+		if(fp || source == NULL){
+			fpn	*numbers;
 			size_t	size = BUFFER_SIZE;
-			numbers=malloc(sizeof(double)*BUFFER_SIZE*memory_exp);
+			numbers=malloc(sizeof(fpn)*BUFFER_SIZE);
 
 
 			if(!numbers){
@@ -69,33 +97,17 @@ double *read_data(const char* source,int* num_count)
 			}
 			for(int i=0;!feof(fp);){
 				if(getline(&buffer,&size,fp)>0){
-					single_number = buffer; 
-					do{
-						test = single_number;
-						dummy = strtod(single_number,&single_number);
-						if(dummy!=0.0 || strcmp(test,single_number)!=0){
-							if(memory_exp*BUFFER_SIZE <= i){
-								memory_exp*=2;
-								temporary_pointer=realloc(numbers,sizeof(double)*BUFFER_SIZE * memory_exp);
-								if(!temporary_pointer){
-									eprintf("read_data: Failed to reallocate memory for data array:");
-								}
-								numbers=temporary_pointer;
-							}
-							(*num_count)++;
-							numbers[i++] = dummy;
-						}
-					}while(strcmp(test,single_number)!=0);
+					numbers = filter(buffer,num_count,numbers);
 				}
 			}
 			fclose(fp);
 			free(buffer);
 			return numbers;
 		} else {
-			eprintf("read_data: Failed to open file \"$s\":",source);
+			eprintf("read_data: Failed to open file \"%s\":",source);
 		}
 	} else {
-		eprintf("read_data: Failed to open file \"$s\":",source);
+		eprintf("read_data: Failed to open file \"%s\":",source);
 	}
 	return NULL;
 }

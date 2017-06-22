@@ -1,6 +1,6 @@
 #include <criterion/criterion.h>
 #include <criterion/logging.h>
-#include "medium_operations.h"
+#include "operations.h"
 #include "io.h"
 #include "dataset.h"
 const char *progname = "tests";

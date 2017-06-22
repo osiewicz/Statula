@@ -1,10 +1,10 @@
 #include "dataset.h"
 
-static void quick_sort(double *arr, int elements)
+static void quick_sort(fpn *arr, int elements)
 {
 	//  public-domain implementation by Darel Rex Finley.
 	const int max_levels = 300;
-	double piv;
+	fpn piv;
 	int beg[max_levels], end[max_levels], i=0, L, R, swap ;
 
 	beg[0]=0;
@@ -48,7 +48,7 @@ int init_dataset(struct dataset *set,unsigned int flags, const char *source)
 {
 	set->number_count = 0;
 	set->flags = (flags & ~MODE_PRESENT);
-	set->numbers = read_data(source,&(set->number_count));
+	set->numbers = read_data(source,&(set->number_count),&rdubl);
 	set->mean = 0;
 	set->median = 0; 
 	set->mode = 0; 

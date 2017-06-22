@@ -1,29 +1,35 @@
 #pragma once
 
+#ifdef REDUCED_PRECISION
+	typedef float fpn;
+#else
+	typedef double fpn;
+#endif
 struct dataset{
 	int	flags : 2;
 	int	number_count;
-	double 	*numbers;
-	double	mean;
-	double	median;
-	double	mode;
-	double	range;
-	double	central_moment;
-	double	standard_deviation;
-	double	mean_absolute_deviation;
-	double	coefficient_of_variation;
-	double	kurtosis;
-	double	skewness;
+	fpn 	*numbers;
+	fpn	mean;
+	fpn	median;
+	fpn	mode;
+	fpn	range;
+	fpn	central_moment;
+	fpn	standard_deviation;
+	fpn	mean_absolute_deviation;
+	fpn	coefficient_of_variation;
+	fpn	kurtosis;
+	fpn	skewness;
 };
 
 #define	MODE_PRESENT (1<<0)
 #define	SORT (1<<1)
+#define DOUBLE_PRECISION (1<<2)
 
-#include "basic_operations.h"
-#include "medium_operations.h"
+#include "operations.h"
 #include "io.h"
 
 int init_dataset(struct dataset *set,unsigned int flags, const char *source);
 int free_dataset(struct dataset *set);
 int compute_dataset(struct dataset *set);
 int print_dataset(struct dataset *set,FILE* stream,const char **text);
+

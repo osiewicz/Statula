@@ -1,6 +1,7 @@
 #include "statula.h"
 
 const char *progname;
+int flags = 0;
 int main(int argc,char **argv)
 {
 	progname=argv[0];
@@ -8,10 +9,11 @@ int main(int argc,char **argv)
 	char	**source_file = malloc(sizeof(char*));
 	char	*language = malloc(sizeof(char)*8);
 	FILE	*save_file = NULL;
-	int	flags = 0, dataset_flags = 0;
+	int	dataset_flags = 0;
 	int	file_count = 0;
+	int	t=1;
 	char	**alloc_temp = NULL;
-	source_file[0] = "data";
+	source_file[0] = NULL;
 	language = "en-gb";
 	flags |= (PRINT_TO_STDOUT);
 	dataset_flags |= (SORT);	
@@ -19,11 +21,13 @@ int main(int argc,char **argv)
 	if(!destination_file || !source_file || !language){
 		eprintf("main: Failed to allocate memory:");
 	}
-  
 	if(argc>1){
 		for(int i=1;i<argc;i++){
-			if(strncmp(argv[i],"--",2)==0){
-				if(argc-i>0 && (strcmp(argv[i],"--help")==0||strcmp(argv[i],"--h")==0)){
+			if(strncmp(argv[i],"--",2)==0){	
+				if(argc-i > 0 && (strcmp(argv[i],"--stdin")==0)){
+					flags |= STDIN;
+				}
+				else if(argc-i>0 && (strcmp(argv[i],"--help")==0||strcmp(argv[i],"--h")==0)){
 					print_help();
 					if(argc==2)
 						return 0;
@@ -32,10 +36,9 @@ int main(int argc,char **argv)
 				} else if(argc-i>0 && (strcmp(argv[i],"--silent")==0)){ 
 					flags &= ~PRINT_TO_STDOUT;
 				} else if(argc-i>1 && strcmp(argv[i],"--o")==0) {
-					int t;
 					for(t=i+1;t<argc && strncmp(argv[t],"--",2)!=0 ; t++);
 					file_count += t-i-1;
-					alloc_temp = realloc(source_file,sizeof(char)*t);
+					alloc_temp = realloc(source_file,sizeof(char*)*file_count);
 					if(!alloc_temp)
 						eprintf("main: Failed to allocate memory:");
 					source_file = alloc_temp;
@@ -54,7 +57,7 @@ int main(int argc,char **argv)
 						return -1;
 					} else {
 						flags |= PRINT_TO_STDOUT;
-						alloc_temp = realloc(destination_file,sizeof(char)*file_count);
+						alloc_temp = realloc(destination_file,sizeof(char*)*file_count);
 						if(!alloc_temp)
 							eprintf("main: Failed to allocate memory:");
 						destination_file = alloc_temp;
@@ -63,11 +66,13 @@ int main(int argc,char **argv)
 							destination_file[j] = argv[++i];
 						}
 					}
+				
 				} else {
-					printf("\nInvalid starting parameter!\n\n");
+					printf("\nInvalid starting parameter \"%s\"!\n\n",argv[i]);
 					print_help();
 					return -1;
 				}
+		
 			} else if(argc==2) {
 				source_file[0] = argv[1];
 				file_count++;
@@ -75,14 +80,29 @@ int main(int argc,char **argv)
 				print_help();
 				return -1;
 			}
+		
 		}
+	} else if( argc == 1){
+		flags |= STDIN;
+		source_file[0]=NULL;
+
 	}
 
-	const char **text = strings(language);
+	const char **text = load_strings(language);
 	struct dataset *set = malloc(sizeof(struct dataset));
 	
 	if( flags & PRINT_TO_STDOUT )
 		printf("\nStatula %s\n",STATULA_VERSION);
+
+	if( flags & STDIN) {
+		file_count++;
+		alloc_temp = realloc(source_file,sizeof(char*)*(file_count));
+		if(!alloc_temp)
+			eprintf("main: Failed to allocate memory");
+		source_file = alloc_temp;
+		alloc_temp=NULL;
+		source_file[file_count-1]=NULL;
+	}
 
 	for(int i=0;i<file_count;i++){
 		init_dataset(set,dataset_flags,source_file[i]);
