@@ -1,60 +1,66 @@
 #include "dataset.h"
 
-static fpn* dataset_parse_default(char* buffer,int* num_count,fpn* numbers);
+static fpn *dataset_parse_default(char *buffer, int *num_count, fpn *numbers);
 
 static void quick_sort(fpn *arr, int elements)
 {
 	//  public-domain implementation by Darel Rex Finley.
 	const int max_levels = 300;
 	fpn piv;
-	int beg[max_levels], end[max_levels], i=0, L, R, swap ;
+	int beg[max_levels], end[max_levels], i = 0, L, R, swap;
 
-	beg[0]=0;
-	end[0]=elements;
-	while (i>=0) {
-		L=beg[i];
-		R=end[i]-1;
-		if (L<R) {
-			piv=arr[L];
-			while (L<R) {
-				while (arr[R]>=piv && L<R)
+	beg[0] = 0;
+	end[0] = elements;
+	while (i >= 0)
+	{
+		L = beg[i];
+		R = end[i] - 1;
+		if (L < R)
+		{
+			piv = arr[L];
+			while (L < R)
+			{
+				while (arr[R] >= piv && L < R)
 					R--;
-				if (L<R)
-					arr[L++]=arr[R];
-				while (arr[L]<=piv && L<R)
+				if (L < R)
+					arr[L++] = arr[R];
+				while (arr[L] <= piv && L < R)
 					L++;
-				if (L<R)
-					arr[R--]=arr[L];
+				if (L < R)
+					arr[R--] = arr[L];
 			}
-			arr[L]=piv;
-			beg[i+1]=L+1;
-			end[i+1]=end[i];
-			end[i]=L;
+			arr[L] = piv;
+			beg[i + 1] = L + 1;
+			end[i + 1] = end[i];
+			end[i] = L;
 			i++;
-      			if (end[i]-beg[i]>end[i-1]-beg[i-1]) {
-				swap=beg[i];
-				beg[i]=beg[i-1];
-				beg[i-1]=swap;
+			if (end[i] - beg[i] > end[i - 1] - beg[i - 1])
+			{
+				swap = beg[i];
+				beg[i] = beg[i - 1];
+				beg[i - 1] = swap;
 
-				swap=end[i];
-				end[i]=end[i-1];
-				end[i-1]=swap;
+				swap = end[i];
+				end[i] = end[i - 1];
+				end[i - 1] = swap;
 			}
-		} else {
+		}
+		else
+		{
 			i--;
 		}
 	}
 }
 
-int init_dataset(struct dataset *set,unsigned int flags, const char *source)
+int init_dataset(struct dataset *set, unsigned int flags, const char *source)
 {
 	set->number_count = 0;
 	set->flags = (flags & ~MODE_PRESENT);
-	set->numbers = read_data(source,&(set->number_count),&dataset_parse_default);
+	set->numbers = read_data(source, &(set->number_count), &dataset_parse_default);
 	set->mean = 0;
-	set->median = 0; 
-	set->mode = 0; 
-	set->range = 0; 
+	set->median = 0;
+	set->mode = 0;
+	set->range = 0;
 	set->central_moment = 0;
 	set->standard_deviation = 0;
 	set->mean_absolute_deviation = 0;
@@ -62,11 +68,13 @@ int init_dataset(struct dataset *set,unsigned int flags, const char *source)
 	set->kurtosis = 0;
 	set->skewness = 0;
 
-	if(!set->numbers){
+	if (!set->numbers)
+	{
 		eprintf("init_dataset: Failed to allocate memory for data: ");
 	}
-			
-	if(set->number_count <= 0){
+
+	if (set->number_count <= 0)
+	{
 		eprintf("init_dataset: Invalid number count:");
 	}
 	return 0;
@@ -80,13 +88,13 @@ int free_dataset(struct dataset *set)
 
 int compute_dataset(struct dataset *set)
 {
-	if((set->flags & SORT) != 0)
-		quick_sort(set->numbers,set->number_count);
+	if ((set->flags & SORT) != 0)
+		quick_sort(set->numbers, set->number_count);
 	mean(set);
 	median(set);
 	mode(set);
 	range(set);
-	central_moment(set,2);
+	central_moment(set, 2);
 	standard_deviation(set);
 	mean_absolute_deviation(set);
 	coefficient_of_variation(set);
@@ -95,44 +103,48 @@ int compute_dataset(struct dataset *set)
 	return 0;
 }
 
-int print_dataset(struct dataset *set,FILE* stream,const char** text)
+int print_dataset(struct dataset *set, FILE *stream, const char **text)
 {
-	fprintf(stream,"\n--------\n%s %d\n%s %f\n%s %f\n%s ",text[0],
-			set->number_count,text[1],(set->mean),text[2],(set->median),text[3]);
-	if((set->flags & MODE_PRESENT) )
-		fprintf(stream,"%f\n",(set->mode));
+	fprintf(stream, "\n--------\n%s %d\n%s %f\n%s %f\n%s ", text[0],
+			set->number_count, text[1], (set->mean), text[2], (set->median), text[3]);
+	if ((set->flags & MODE_PRESENT))
+		fprintf(stream, "%f\n", (set->mode));
 	else
-		fprintf(stream,"%s\n",text[11]);
-	fprintf(stream,"%s %f\n%s %f\n%s %f\n%s %f\n%s %.2f\%\n%s %f\n%s %f\n--------\n",
-		text[4],(set->range),text[5],(set->central_moment),text[6],(set->standard_deviation),
-		text[7], (set->mean_absolute_deviation),text[8],(set->coefficient_of_variation),
-		text[9],(set->kurtosis),text[10],(set->skewness));
+		fprintf(stream, "%s\n", text[11]);
+	fprintf(stream, "%s %f\n%s %f\n%s %f\n%s %f\n%s %.2f\%\n%s %f\n%s %f\n--------\n",
+			text[4], (set->range), text[5], (set->central_moment), text[6], (set->standard_deviation),
+			text[7], (set->mean_absolute_deviation), text[8], (set->coefficient_of_variation),
+			text[9], (set->kurtosis), text[10], (set->skewness));
 
 	return 1;
 }
 
-static fpn *dataset_parse_default(char *buffer,int *num_count,fpn *numbers)
-{	
-	static int memory_exp=1;
-	char	*single_number = buffer;
-	char	*test = NULL;
-	fpn	dummy;
-	fpn	*temporary_pointer = NULL;
-	do{
+static fpn *dataset_parse_default(char *buffer, int *num_count, fpn *numbers)
+{
+	static int memory_exp = 1;
+	char *single_number = buffer;
+	char *test = NULL;
+	fpn dummy;
+	fpn *temporary_pointer = NULL;
+	do
+	{
 		test = single_number;
-		dummy = strtod(single_number,&single_number);
-		if(test != single_number || dummy!=0.0 ){
-			if(memory_exp*BUFFER_SIZE <= (*num_count)){
-				memory_exp*=2;
-				temporary_pointer=realloc(numbers,sizeof(fpn)*BUFFER_SIZE * memory_exp);
-				if(!temporary_pointer){
+		dummy = strtod(single_number, &single_number);
+		if (test != single_number || dummy != 0.0)
+		{
+			if (memory_exp * BUFFER_SIZE <= (*num_count))
+			{
+				memory_exp *= 2;
+				temporary_pointer = realloc(numbers, sizeof(fpn) * BUFFER_SIZE * memory_exp);
+				if (!temporary_pointer)
+				{
 					eprintf("read_data: Failed to reallocate memory for data array:");
 				}
-				numbers=temporary_pointer;
+				numbers = temporary_pointer;
 			}
 			numbers[*num_count] = dummy;
 			(*num_count)++;
 		}
-	}while(test != single_number);
-	return (fpn*)numbers;
+	} while (test != single_number);
+	return (fpn *)numbers;
 }
