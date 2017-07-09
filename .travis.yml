@@ -4,5 +4,4 @@ before_install:
         - sudo apt-get update
         - sudo apt-get install -y criterion-dev
 script:
-        cd src && make
-        cd tests && make && ./statula_tests
+       - cd tests && make && ./statula_tests
