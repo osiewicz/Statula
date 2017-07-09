@@ -1,5 +1,8 @@
 language: c
-install: criterion
+before_install:
+        - sudo add-apt-repository ppa:snaipewastaken/ppa
+        - sudo apt-get update
+        - sudo apt-get install criterion-dev
 script:
         cd src && make
         cd tests && make && ./statula_tests
