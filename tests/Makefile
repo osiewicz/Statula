@@ -1,6 +1,6 @@
 IDIR =../include
 CC=gcc
-CFLAGS=-I$(IDIR) -std=gnu11
+CFLAGS=-I$(IDIR) -std=c99
 VPATH=../src
 
 ODIR=obj
