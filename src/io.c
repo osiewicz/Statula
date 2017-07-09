@@ -6,22 +6,18 @@ static FILE *open_lang_file(const char *language);
 
 const char **load_strings(char *language)
 {
+	static char *(text)[MAX_LINE_COUNT];
 	static int ref_counter = 0;
-	if (ref_counter == 0)
-	{
-		static char *(text)[MAX_LINE_COUNT];
+	if (ref_counter == 0) {
 		char *newline_char;
 		FILE *fp;
 		size_t max_line_size = 100;
 		fp = open_lang_file(language);
-		if (!fp)
-		{
+		if (!fp) {
 			eprintf("strings: Failed to open file \".%s.lang\":", language);
 		}
-		for (int i = 0; i < MAX_LINE_COUNT && !feof(fp); i++)
-		{
-			if (getline(&(text)[i], &max_line_size, fp) > 0)
-			{
+		for (int i = 0; i < MAX_LINE_COUNT && !feof(fp); i++) {
+			if (getline(&(text)[i], &max_line_size, fp) > 0) {
 				newline_char = strpbrk(text[i], "\n");
 				*newline_char = 0;
 			}
@@ -29,10 +25,8 @@ const char **load_strings(char *language)
 		fclose(fp);
 		ref_counter++;
 		return (const char **)text;
-	}
-	else
-	{
-		eprintf("strings: Attempted reload of local strings!");
+	} else {
+		return (const char **)text;
 	}
 }
 
@@ -43,16 +37,12 @@ static FILE *open_lang_file(const char *language)
 	filename[0] = '.';
 	memcpy(filename + 1, language, strlen(language));
 	strncat(filename + strlen(language), ".lang", 5);
-	if (access(filename, F_OK) != -1)
-	{
+	if (access(filename, F_OK) != -1) {
 		fp = fopen(filename, "r");
-		if (!fp)
-		{
+		if (!fp) {
 			eprintf("open_lang_file: Failed to open file .%s.lang:", language);
 		}
-	}
-	else
-	{
+	} else {
 		eprintf("open_lang_file: File \".%s.lang\" was not found:", language);
 	}
 	return fp;
@@ -65,43 +55,35 @@ void *read_data(const char *source, int *num_count, fpn *(*filter)(char *buffer,
 	{
 		FILE *fp;
 		char *buffer = malloc(sizeof(char) * BUFFER_SIZE);
-		if (!buffer)
-		{
+		if (!buffer) {
 			eprintf("read_data: Failed to allocate memory for line buffer:");
 		}
-		if (source == NULL)
+		if (source == NULL) {
 			fp = stdin;
-		else
+		} else {
 			fp = fopen(source, "r");
-		if (fp || source == NULL)
-		{
+		}
+		if (fp || source == NULL) {
 			fpn *numbers;
 			size_t size = BUFFER_SIZE;
 			numbers = malloc(sizeof(fpn) * BUFFER_SIZE);
 
-			if (!numbers)
-			{
+			if (!numbers) {
 				eprintf("read_data: Failed to allocate memory for data array:");
 			}
-			for (int i = 0; !feof(fp);)
-			{
-				if (getline(&buffer, &size, fp) > 0)
-				{
+			for (int i = 0; !feof(fp);) {
+				if (getline(&buffer, &size, fp) > 0) {
 					numbers = filter(buffer, num_count, numbers);
 				}
 			}
 			fclose(fp);
 			free(buffer);
 			return numbers;
-		}
-		else
-		{
+		} else {
 			eprintf("read_data: Failed to open file \"%s\":", source);
 		}
-	}
-	else
-	{
-		eprintf("read_data: Failed to open file \"%s\":", source);
+	} else {
+		eprintf("read_data: Failed to access file \"%s\":", source);
 	}
 	return NULL;
 }
@@ -116,8 +98,9 @@ void eprintf(char *fmt, ...)
 	vfprintf(stderr, fmt, args);
 	va_end(args);
 
-	if (fmt[0] != '\0' && fmt[strlen(fmt) - 1])
+	if (fmt[0] != '\0' && fmt[strlen(fmt) - 1]) {
 		fprintf(stderr, "%s", strerror(errno));
+	}
 	fprintf(stderr, "\n");
 	exit(2);
 }

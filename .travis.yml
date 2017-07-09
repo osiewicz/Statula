@@ -1,0 +1,5 @@
+language: c
+install: criterion
+script:
+        cd src && make
+        cd tests && make && ./statula_tests

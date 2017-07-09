@@ -15,8 +15,8 @@ struct dataset
 	fpn mode;
 	fpn range;
 	fpn central_moment;
-	fpn standard_deviation;
-	fpn mean_absolute_deviation;
+	fpn std_deviation;
+	fpn m_abs_deviation;
 	fpn coefficient_of_variation;
 	fpn kurtosis;
 	fpn skewness;
