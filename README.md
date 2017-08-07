@@ -3,7 +3,7 @@
 ***
 
 ### Simple terminal-based program for descriptive statistics
-##### *Current version: 0.1.9*
+##### *Current version: 0.1.10*
 [![Build Status](https://travis-ci.org/PiotrOsiewicz/Statula.svg?branch=master)](https://travis-ci.org/PiotrOsiewicz/Statula)
 [![license](https://img.shields.io/github/license/PiotrOsiewicz/statula.svg)]()
 
@@ -19,13 +19,14 @@ into your terminal. Data should be in text file which contains only whitespaces 
 In case there is a character that does not meet above demands, all remaining characters of the current line shall be skipped.
 
 ##### Starting Parameters
->**--h**	*Prints simple help panel*  
-**--o**		*Open specified file*  
-**--s**		*Save result to specified file. Amount of targets must be equal to amount of files opened via --o*  
-**--l**		*Print result using specified language (language file has to be present in the current directory.*  
-**--silent**	*Disable printing to standard output.*  
-**--nosort**	*Disable sorting the input. It results in vast performance improvement at the risk of incorrect results in mode, median and skewness.* **USE WITH CAUTION**   
-**--stdin**	*Read directly from stdin. It is the default behaviour if Statula does not receive any starting parameters. Use EOF combination (which is CTRL+D on most systems) to finish data input.*
+>**-h/--help**		*Prints simple help panel*  
+**-o/--open**		*Open specified file*  
+**-s/--save**		*Save result to specified file. Amount of targets must be equal to amount of files opened via --o*  
+**-l/--language**	*Print result using specified language (language file has to be present in the current directory.*  
+**--precision**		*Print result using specified float precision.*
+**--silent**		*Disable printing to standard output.*  
+**--nosort**		*Disable sorting the input. It results in vast performance improvement at the risk of incorrect results in mode, median and skewness.* **USE WITH CAUTION**   
+**--stdin**		*Read directly from stdin. It is the default behaviour if Statula does not receive any starting parameters. Use EOF combination (which is CTRL+D on most systems) to finish data input.*
 Statula does not receive any starting parameters. Use EOF combination (which is
 *If there is just one string after "./statula" (not starting with "--"), then it shall be used as a default filename for the session.*
 

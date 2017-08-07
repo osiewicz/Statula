@@ -14,6 +14,7 @@ int main(int argc, char **argv)
 	int file_count = 0;
 	int t = 1;
 	char **alloc_temp = NULL;
+	int precision = DEFAULT_PRECISION;
 	source_file[0] = NULL;
 	language = "en-gb";
 	flags |= (PRINT_TO_STDOUT);
@@ -25,10 +26,11 @@ int main(int argc, char **argv)
 
 	if (argc > 1) {
 		for (int i = 1; i < argc; i++) {
-			if (strncmp(argv[i], "--", 2) == 0) {
+			if (strncmp(argv[i], "-", 1) == 0) {
 				if (argc - i > 0 && (strcmp(argv[i], "--stdin") == 0)) {
 					flags |= STDIN;
-				} else if (argc - i > 0 && (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "--h") == 0)) {
+				} else if (argc - i > 0 && (strcmp(argv[i], "--help") == 0
+							|| strcmp(argv[i], "-h") == 0)) {
 					print_help();
 					if (argc == 2) {
 						return 0;
@@ -37,7 +39,14 @@ int main(int argc, char **argv)
 					dataset_flags &= ~SORT;
 				} else if (argc - i > 0 && (strcmp(argv[i], "--silent") == 0)) {
 					flags &= ~PRINT_TO_STDOUT;
-				} else if (argc - i > 1 && strcmp(argv[i], "--o") == 0) {
+				} else if (argc - i > 1 && strcmp(argv[i],"--precision") == 0){
+					precision = strtol(argv[i+1],NULL,10);
+					if(precision<0){
+						precision = DEFAULT_PRECISION;
+					}
+					i++;
+				} else if (argc - i > 1 && (strcmp(argv[i], "-o") == 0 || 
+						strcmp(argv[i],"--open"))) {
 					for (t = i + 1; t < argc && strncmp(argv[t], "--", 2) != 0; t++)
 						{ }
 					file_count += t - i - 1;
@@ -50,11 +59,13 @@ int main(int argc, char **argv)
 					for (int j = 0; j < t - i; j++) {
 						source_file[j] = argv[++i];
 					}
-				} else if (argc - i > 1 && strcmp(argv[i], "--l") == 0) {
+				} else if (argc - i > 1 && (strcmp(argv[i], "-l") == 0 ||
+						strcmp(argv[i],"--language") == 0)) {
 					if (strncmp(argv[i + 1], "--", 2) != 0) {
 						language = argv[++i];
 					}
-				} else if (argc - i > 1 && strcmp(argv[i], "--s") == 0) {
+				} else if (argc - i > 1 && (strcmp(argv[i], "-s") == 0
+						|| strcmp(argv[i],"--save") == 0)) {
 					int t;
 					for (t = i + 1; t < argc && strncmp(argv[t], "--", 2) != 0; t++)
 						{ }
@@ -74,16 +85,15 @@ int main(int argc, char **argv)
 						}
 					}
 				} else {
-					printf("\nInvalid starting parameter \"%s\"!\n\n", argv[i]);
 					print_help();
-					return -1;
+					eprintf("\nInvalid starting parameter \"%s\"!\n\n", argv[i]);
 				}
 			} else if (argc == 2) {
 				source_file[0] = argv[1];
 				file_count++;
 			} else {
 				print_help();
-				return -1;
+				eprintf("\nInvalid starting parameter \"%s\"!\n\n", argv[i]);
 			}
 		}
 	} else if (argc == 1) {
@@ -113,12 +123,12 @@ int main(int argc, char **argv)
 		init_dataset(set, dataset_flags, source_file[i]);
 		compute_dataset(set);
 		if (flags & PRINT_TO_STDOUT) {
-			print_dataset(set, stdout, text);
+			print_dataset(set, stdout, text,precision);
 		}
 		if (flags & SAVE_TO_FILE) {
 			save_file = fopen(destination_file[i], "w");
 			if (save_file) {
-				print_dataset(set, save_file, text);
+				print_dataset(set, save_file, text,precision);
 				fclose(save_file);
 			} else {
 				eprintf("main: Failed to create file '%s':", destination_file[i]);

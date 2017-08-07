@@ -31,4 +31,4 @@ struct dataset
 int init_dataset(struct dataset *set, unsigned int flags, const char *source);
 int free_dataset(struct dataset *set);
 int compute_dataset(struct dataset *set);
-int print_dataset(struct dataset *set, FILE *stream, const char **text);
+int print_dataset(struct dataset *set, FILE *stream, const char **text,int precision);

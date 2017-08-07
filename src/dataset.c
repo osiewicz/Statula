@@ -100,19 +100,21 @@ int compute_dataset(struct dataset *set)
 	return 0;
 }
 
-int print_dataset(struct dataset *set, FILE *stream, const char **text)
+int print_dataset(struct dataset *set, FILE *stream, const char **text,int precision)
 {
-	fprintf(stream, "\n--------\n%s %d\n%s %f\n%s %f\n%s ", text[0],
-			set->number_count, text[1], (set->mean), text[2], (set->median), text[3]);
+	fprintf(stream, "\n--------\n%s %d\n%s %.*f\n%s %.*f\n%s ", text[0],
+			set->number_count, text[1], precision, (set->mean), text[2],
+			precision,(set->median), text[3]);
 	if ((set->flags & MODE_PRESENT)) {
-		fprintf(stream, "%f\n", (set->mode));
+		fprintf(stream, "%.*f\n",precision, (set->mode));
 	} else {
 		fprintf(stream, "%s\n", text[11]);
 	}
-	fprintf(stream, "%s %f\n%s %f\n%s %f\n%s %f\n%s %.2f\%\n%s %f\n%s %f\n--------\n",
-			text[4], (set->range), text[5], (set->central_moment), text[6], (set->std_deviation),
-			text[7], (set->m_abs_deviation), text[8], (set->coefficient_of_variation),
-			text[9], (set->kurtosis), text[10], (set->skewness));
+	fprintf(stream, "%s %.*lf\n%s %.*lf\n%s %.*f\n%s %.*f\n%s %.*f\%\n%s %.*f\n%s %.*f\n--------\n",
+			text[4], precision, (set->range), text[5], precision, (set->central_moment),
+			text[6], precision, (set->std_deviation), text[7], precision, (set->m_abs_deviation),
+			text[8], precision, (set->coefficient_of_variation),
+			text[9], precision, (set->kurtosis), text[10], precision, (set->skewness));
 	return 0;
 }
 
