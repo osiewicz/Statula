@@ -21,9 +21,12 @@ Whenever you make actual change to the codebase, please:
 ### Commit messages
 Whenever you make a commit, give it a meaningful message. A good template to
 stick to is:
-- Changed_file_name(s) - Changed_function_name(s) - Short description of change  
- 
-First field can be replaced with "general". Second field can be ommited.   
+Changed file's name:  
+Changed_function_name(s) - Short description of change  
+Changed_function_name(s) - Short description of change  
+
+New functions should be listed as a change under the header file.  
+File name can be replaced with "general". Second field can be ommited.   
 "General" should be used for changes such as:
 - General - Clean up variable naming
 - General - New file en-us.lang  
@@ -33,6 +36,8 @@ Keep in mind that new source files should have their own field - for example:
 is incorrect. Use:  
 - new_awesome_functionality.c - New file. Includes new awesome functionality
   for server connection  
+That's different from "New file en-us.lang" since the latter is not a source
+file.
 First field can include multiple files if changes concern only those files.
 Second field can include multiple functions.  
 In new versions, first line of the commit message must start with 'v' - for

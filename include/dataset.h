@@ -25,10 +25,11 @@ struct dataset
 #define MODE_PRESENT (1 << 0)
 #define SORT (1 << 1)
 
-#include "operations.h"
-#include "io.h"
+#include <statula.h>
+#include <operations.h>
+#include <io.h>
 
 int init_dataset(struct dataset *set, unsigned int flags, const char *source);
 int free_dataset(struct dataset *set);
 int compute_dataset(struct dataset *set);
-int print_dataset(struct dataset *set, FILE *stream, const char **text,int precision);
+int print_dataset(struct dataset *set, FILE *stream, struct settings *settings,const char *dataset_name);

@@ -1,11 +1,11 @@
 IDIR =../include
 CC=gcc
-CFLAGS=-I$(IDIR) -O3 -std=c99
+CFLAGS= -g -I$(IDIR) -O3 -std=c99 
 
 ODIR=obj
 LDI =../lib
 
-LIBS=-lm
+LIBS=-lm 
 
 _DEPS = operations.h io.h statula.h dataset.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
@@ -13,7 +13,7 @@ DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 _OBJ = statula.o dataset.o operations.o io.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-$(ODIR)/%.o: %.c $(DEPS)
+$(ODIR)/%.o: %.c $(DEPS) 
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 statula: $(OBJ)
