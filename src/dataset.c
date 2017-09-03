@@ -4,11 +4,16 @@ static fpn *dataset_parse_default(char *buffer, int *num_count, fpn *numbers);
 
 static void quick_sort(fpn *arr, int elements)
 {
-	//  public-domain implementation by Darel Rex Finley.
+	/* public-domain implementation by Darel Rex Finley.
+	 * Responsibilities:
+	 * Sorts passed array of floating point number.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	const int max_levels = 300;
 	fpn piv;
 	int beg[max_levels], end[max_levels], i = 0, L, R, swap;
-
+	
 	beg[0] = 0;
 	end[0] = elements;
 	while (i >= 0) {
@@ -39,7 +44,7 @@ static void quick_sort(fpn *arr, int elements)
 				swap = beg[i];
 				beg[i] = beg[i - 1];
 				beg[i - 1] = swap;
-
+	
 				swap = end[i];
 				end[i] = end[i - 1];
 				end[i - 1] = swap;
@@ -49,8 +54,14 @@ static void quick_sort(fpn *arr, int elements)
 		}
 	}
 }
+
 static void set_defaults_dataset(struct dataset *set)
 {
+	/* Responsibilities:
+	 * Sets set struct to default values.
+	 * Memory allocation responsibilites: None.
+	 */
+	
 	set->number_count = 0;
 	set->flags = 0;
 	set->numbers = NULL;
@@ -64,35 +75,53 @@ static void set_defaults_dataset(struct dataset *set)
 	set->coefficient_of_variation = 0;
 	set->kurtosis = 0;
 	set->skewness = 0;
-
 }
 
 int init_dataset(struct dataset *set, unsigned int flags, const char *source)
 {
-
+	/* Responsibilities:
+	 * Prepares set (with memory allocated beforehand) for statistical
+	 * operations. 
+	 * Memory allocation responsibilities: Delegated to other functions.
+	 */
+	
+	if(set==NULL){
+		eprintf("init_dataset: NULL pointer passed: ");
+	}
 	set_defaults_dataset(set);
 	set->flags = (flags & ~MODE_PRESENT);
 	set->numbers = read_data(source, &(set->number_count), &dataset_parse_default);
-
+	
 	if (!set->numbers) {
 		eprintf("init_dataset: Failed to allocate memory for data: ");
 	}
-
+	
 	if (set->number_count <= 0) {
-		eprintf("init_dataset: Invalid number count:");
+		eprintf("init_dataset: Invalid number count: ");
 	}
 	return 0;
 }
 
 int free_dataset(struct dataset *set)
 {
+	/* Responsibilites:
+	 * Cleans up set structure.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	free(set->numbers);
 	set_defaults_dataset(set);
+	free(set);
 	return 0;
 }
 
 int compute_dataset(struct dataset *set)
 {
+	/* Responsibilities:
+	 * Fills up set structure with results of computation.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	if ((set->flags & SORT) != 0) {
 		quick_sort(set->numbers, set->number_count);
 	}
@@ -111,6 +140,15 @@ int compute_dataset(struct dataset *set)
 
 int print_dataset(struct dataset *set, FILE *stream, struct settings *settings,const char *dataset_name)
 {
+	/* Responsibilities:
+	 * Prints dataset to 'stream'.
+	 * Memory allocation responsibilities: None.
+	 */
+
+	if(settings == NULL || set == NULL){
+		eprintf("print_dataset: NULL pointer passed: ");
+	}
+	
 	if(settings->flags & PRINT_FILE_NAME){
 		fprintf(stream,"%s",dataset_name==NULL?"Standard input":dataset_name);
 	}
@@ -132,6 +170,15 @@ int print_dataset(struct dataset *set, FILE *stream, struct settings *settings,c
 
 static fpn *dataset_parse_default(char *buffer, int *num_count, fpn *numbers)
 {
+	/* Responsibilities:
+	 * Extracts floating point numbers from 'buffer', increments num_count
+	 * and puts results into 'numbers'. It is responsible for reallocating
+	 * 'numbers' in case there is not enough space for result. If passed
+	 * NULL 'buffer','num_count' and 'numbers' pointers, it should reset
+	 * memory_exp and return NULL.
+	 * Memory allocation responsibilities: Allocates memory.
+	 */
+	
 	static int memory_exp = 1;
 	char *single_number = buffer;
 	char *test = NULL;
@@ -159,3 +206,4 @@ static fpn *dataset_parse_default(char *buffer, int *num_count, fpn *numbers)
 	} while (test != single_number);
 	return (fpn *)numbers;
 }
+

@@ -1,18 +1,17 @@
 #pragma once
 
 
-#define STATULA_VERSION "v0.1.11"
+#define STATULA_VERSION "v0.1.12"
 
 //flags
 #define PRINT_TO_STDOUT (1 << 0)
-#define SAVE_TO_FILE (1 << 1)
-#define STDIN (1 << 2)
-#define PRINT_HELP (1<<3)
-#define PRINT_FILE_NAME (1<<4)
+#define STDIN (1 << 1)
+#define PRINT_HELP (1<<2)
+#define PRINT_FILE_NAME (1<<3)
 
 #define DEFAULT_PRECISION 6
 struct settings{
-	const char **text;
+	char **text;
 	char **input_files;
 	char *language;
 	char **output_files;
@@ -23,12 +22,14 @@ struct settings{
 	int precision;
 };
 
-
-
-#include "dataset.h"
-#include "io.h"
-
 extern const char *progname;
 
+void process_file(struct settings *settings,int index);
+void handle_flags(struct settings *settings);
+void enable_stdin(struct settings *settings);
+int is_argument(char *argument);
+int is_valid_parameter(char *parameter, char *long_form,char *short_form);
+struct settings *init_settings(void);
+void free_settings(struct settings *settings);
 void print_help(void);
 struct settings *parse_cmd_args(int argc,char **argv);

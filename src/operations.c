@@ -1,9 +1,14 @@
-#include "operations.h"
+#include <operations.h>
 
 static long long int fact_iter(int counter, const int target, long long int accumulator);
 
 int mean(struct dataset *set)
 {
+	/* Responsibilities:
+	 * Calculates mean for given dataset.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	if (set->number_count < 1) {
 		return 1;
 	}
@@ -17,6 +22,11 @@ int mean(struct dataset *set)
 
 int median(struct dataset *set)
 {
+	/* Responsibilities:
+	 * Calculates median for given dataset. Relies on dataset being sorted.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	if (set->number_count < 1) {
 		return 1;
 	}
@@ -30,6 +40,11 @@ int median(struct dataset *set)
 
 int mode(struct dataset *set)
 {
+	/* Responsibilities:
+	 * Calculates mode for given dataset. Relies on dataset being sorted.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	double current_mode = 0;
 	int max_count = 0, j, mode_count = 0;
 	for (int i = 0; i + max_count - 1 < set->number_count; i++) {
@@ -58,6 +73,11 @@ int mode(struct dataset *set)
 
 int range(struct dataset *set)
 {
+	/* Responsibilities:
+	 * Calculates range of given dataset.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	double max = set->numbers[0];
 	double min = set->numbers[0];
 	for (int i = 0; i < set->number_count; i++) {
@@ -73,11 +93,16 @@ int range(struct dataset *set)
 
 int central_moment(struct dataset *set, int degree)
 {
+	/* Responsibilities:
+	 * Calculates central moment of given degree for passed dataset.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	if (degree < 1) {
 		return 1;
 	}
 	double c_moment = 0;
-
+	
 	for (int i = 0; i < set->number_count; i++) {
 		c_moment += pow((set->numbers[i] - set->mean), degree);
 	}
@@ -92,14 +117,23 @@ int central_moment(struct dataset *set, int degree)
 
 int std_deviation(struct dataset *set)
 {
+	/* Responsibilities:
+	 * Calculates standard deviation of given dataset.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	set->std_deviation = sqrt(set->central_moment);
 	return 0;
 }
 
 int m_abs_deviation(struct dataset *set)
 {
+	/* Responsibilities:
+	 * Calculates mean absolute deviation of given dataset.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	double m_o_d = 0;
-
 	for (int i = 0; i < set->number_count; i++) {
 		m_o_d += fabs(set->numbers[i] - set->mean);
 	}
@@ -109,6 +143,11 @@ int m_abs_deviation(struct dataset *set)
 
 int coefficient_of_variation(struct dataset *set)
 {
+	/* Responsibilities:
+	 * Calculates coefficient of variation for given dataset.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	if (set->mean == 0) {
 		set->coefficient_of_variation = 0;
 		return 1;
@@ -119,6 +158,11 @@ int coefficient_of_variation(struct dataset *set)
 
 int kurtosis(struct dataset *set)
 {
+	/* Responsibilities:
+	 * Calculates kurtosis of given dataset.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	central_moment(set, 4);
 	if (set->std_deviation == 0) {
 		return 1;
@@ -129,6 +173,11 @@ int kurtosis(struct dataset *set)
 
 int skewness(struct dataset *set)
 {
+	/* Responsibilities:
+	 * Calculates skewness of given dataset. Relies on dataset being sorted.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	if (set->std_deviation == 0) {
 		return 1;
 	}
@@ -140,16 +189,31 @@ int skewness(struct dataset *set)
 
 static long long int fact_iter(int counter, const int target, long long int accumulator)
 {
+	/* Responsibilities:
+	 * Calculates factorial in an iterative manner.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	return counter > target ? accumulator : fact_iter(counter + 1, target, accumulator * counter);
 }
 
 long long int factorial(int n)
 {
+	/* Responsibilities:
+	 * Calls fact_iter with proper parameters.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	return fact_iter(1, n, 1);
 }
 /*** mathematical statistics - basic tools ***/
 
 double cdf(double x) //stands for: cumulative distribution function
 {
+	/* Responsibilities:
+	 * Calculates cumulative distribution function for given x.
+	 * Memory allocation responsibilities: None.
+	 */
+	
 	return 0.5 * (1 + erf(x / sqrt(2)));
 }

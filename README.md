@@ -3,7 +3,7 @@
 ***
 
 ### Simple terminal-based program for descriptive statistics
-##### *Current version: 0.1.11*
+##### *Current version: 0.1.12*
 [![Build Status](https://travis-ci.org/PiotrOsiewicz/Statula.svg?branch=master)](https://travis-ci.org/PiotrOsiewicz/Statula)
 [![license](https://img.shields.io/github/license/PiotrOsiewicz/statula.svg)]()
 
@@ -45,22 +45,37 @@ Following section might come in useful if you plan to familiarize yourself with 
   
 **Statula:**  
   
-|   Bit  |   2   |       1      |        0        |
-|:------:|:-----:|:------------:|:---------------:|
-| Option | STDIN | SAVE_TO_FILE | PRINT_TO_STDOUT |
+|   Bit  |       3         |      2     |   1   |        0        |
+|:------:|:---------------:|:----------:|:-----:|:---------------:|
+| Option | PRINT_FILE_NAME | PRINT_HELP | STDIN | PRINT_TO_STDOUT |
   
 ***
+#### *QTYMCUW*
+##### Questions that you might come up with.  
+
+Q: What do "memory allocation responsibilities" mean?   
+A: In short: "None" means that the function doesn't allocate memory that's
+visible outside of it's scope.  
+
+"Delegated to other functions" - memory allocation is delegated to other
+functions, but if you were to compare memory usage from before and after
+calling the function, new memory is allocated. It's just not done by that
+function itself.  
+
+"Allocates memory" speaks for itself.  
+
+You can sort of deduce complexity of a function based on it's memory allocation
+responsibilities - high-level ones usually have
+second type of memory allocation responsibilities, whereas primitives may allocate memory (init_
+functions) or not (is_ boolean functions).
+
 #### *TODO*
 
   * Mathematical statistics
 
   * Extend fuctionalities in descriptive statistics
 
-  * Extend starting parameters in order to allow for multiple configurations
-
   * Get around limitations of current language system for help panel*
-
-  * Allow user to specify format in which data should be printed
 
 
 *I think help panel should work even if Statula is unable to load strings from file, however I am not quite sure how can I avoid hard-coding

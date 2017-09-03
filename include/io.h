@@ -13,6 +13,7 @@
 
 extern const char *progname;
 
-const char **load_strings(char *language);
+char **load_strings(char *language);
+void free_strings(char **text);
 void *read_data(const char *source, int *num_count, fpn *(*filter)(char *buffer, int *num_count, fpn *numbers));
 void eprintf(char *fmt, ...);
