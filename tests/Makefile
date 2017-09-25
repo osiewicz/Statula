@@ -3,23 +3,21 @@ CC=gcc
 CFLAGS=-I$(IDIR) -std=c99
 VPATH=../src
 
-ODIR=obj
+ODIR=../tests/obj
 LDI =../lib
 
 LIBS=-lm -lcriterion
 
-_DEPS = operations.h io.h
+_DEPS = operations.h io.h dataset.h misc.h 
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = tests.o operations.o dataset.o io.o
+_OBJ = operations.o dataset.o io.o misc.o tests.o 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
-
+	$(CC) -DTEST $< $(CFLAGS) -c -o $@ 
 statula_tests: $(OBJ)
-	gcc -o $@ $^ $(CFLAGS) $(LIBS)
-
+	$(CC) -DTEST $^ $(CFLAGS) $(LIBS) -o $@ 
 .PHONY: clean
 
 clean:

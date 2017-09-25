@@ -1,6 +1,7 @@
 #pragma once
 #include <math.h>
-#include <dataset.h>
+
+struct dataset;
 
 int mean(struct dataset *set);
 int median(struct dataset *set);

@@ -8,12 +8,18 @@
 #include <unistd.h>
 #include <dataset.h>
 
-#define MAX_LINE_COUNT 20
 #define BUFFER_SIZE 1024
 
 extern const char *progname;
 
-char **load_strings(char *language);
-void free_strings(char **text);
+struct strings{
+	char **text;
+	char *language;
+	int line_count;
+};
+
+char **load_strings(const char *language,int *count);
+struct strings *init_strings(const char *language);
+int free_strings(struct strings *strings);
 void *read_data(const char *source, int *num_count, fpn *(*filter)(char *buffer, int *num_count, fpn *numbers));
 void eprintf(char *fmt, ...);

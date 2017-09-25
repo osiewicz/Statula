@@ -1,7 +1,5 @@
 #include "dataset.h"
 
-static fpn *dataset_parse_default(char *buffer, int *num_count, fpn *numbers);
-
 static void quick_sort(fpn *arr, int elements)
 {
 	/* public-domain implementation by Darel Rex Finley.
@@ -85,19 +83,31 @@ int init_dataset(struct dataset *set, unsigned int flags, const char *source)
 	 * Memory allocation responsibilities: Delegated to other functions.
 	 */
 	
-	if(set==NULL){
+	if(set == NULL){
+#ifdef TEST
+		return -1;
+#else
 		eprintf("init_dataset: NULL pointer passed: ");
+#endif
 	}
 	set_defaults_dataset(set);
 	set->flags = (flags & ~MODE_PRESENT);
 	set->numbers = read_data(source, &(set->number_count), &dataset_parse_default);
 	
 	if (!set->numbers) {
+#ifdef TEST
+		return -2;
+#else
 		eprintf("init_dataset: Failed to allocate memory for data: ");
+#endif
 	}
 	
 	if (set->number_count <= 0) {
+#ifdef TEST
+		return -3;
+#else
 		eprintf("init_dataset: Invalid number count: ");
+#endif
 	}
 	return 0;
 }
@@ -144,31 +154,35 @@ int print_dataset(struct dataset *set, FILE *stream, struct settings *settings,c
 	 * Prints dataset to 'stream'.
 	 * Memory allocation responsibilities: None.
 	 */
-
-	if(settings == NULL || set == NULL){
+	if(settings == NULL || set == NULL || stream == NULL){
+#ifdef TEST
+		return -1;
+#else
 		eprintf("print_dataset: NULL pointer passed: ");
+#endif
 	}
+	char **text = settings->strings->text;
 	
 	if(settings->flags & PRINT_FILE_NAME){
 		fprintf(stream,"%s",dataset_name==NULL?"Standard input":dataset_name);
 	}
-	fprintf(stream, "\n--------\n%s %d\n%s %.*f\n%s %.*f\n%s ", settings->text[0],
-			set->number_count, settings->text[1], settings->precision, (set->mean), settings->text[2],
-			settings->precision,(set->median), settings->text[3]);
+	fprintf(stream, "\n--------\n%s %d\n%s %.*f\n%s %.*f\n%s ", text[0],
+			set->number_count, text[1], settings->precision, (set->mean), text[2],
+			settings->precision,(set->median), text[3]);
 	if ((set->flags & MODE_PRESENT)) {
 		fprintf(stream, "%.*f\n",settings->precision, (set->mode));
 	} else {
-		fprintf(stream, "%s\n", settings->text[11]);
+		fprintf(stream, "%s\n", text[11]);
 	}
 	fprintf(stream, "%s %.*lf\n%s %.*lf\n%s %.*f\n%s %.*f\n%s %.*f\%\n%s %.*f\n%s %.*f\n--------\n",
-			settings->text[4], settings->precision, (set->range), settings->text[5], settings->precision, (set->central_moment),
-			settings->text[6], settings->precision, (set->std_deviation), settings->text[7], settings->precision, (set->m_abs_deviation),
-			settings->text[8], settings->precision, (set->coefficient_of_variation),
-			settings->text[9], settings->precision, (set->kurtosis), settings->text[10], settings->precision, (set->skewness));
+			text[4], settings->precision, (set->range), text[5], settings->precision, (set->central_moment),
+			text[6], settings->precision, (set->std_deviation), text[7], settings->precision, (set->m_abs_deviation),
+			text[8], settings->precision, (set->coefficient_of_variation),
+			text[9], settings->precision, (set->kurtosis), text[10], settings->precision, (set->skewness));
 	return 0;
 }
 
-static fpn *dataset_parse_default(char *buffer, int *num_count, fpn *numbers)
+fpn *dataset_parse_default(char *buffer, int *num_count, fpn *numbers)
 {
 	/* Responsibilities:
 	 * Extracts floating point numbers from 'buffer', increments num_count
@@ -196,7 +210,11 @@ static fpn *dataset_parse_default(char *buffer, int *num_count, fpn *numbers)
 				memory_exp *= 2;
 				temporary_pointer = realloc(numbers, sizeof(fpn) * BUFFER_SIZE * memory_exp);
 				if (!temporary_pointer) {
+#ifdef TEST
+					return NULL;
+#else
 					eprintf("read_data: Failed to reallocate memory for data array:");
+#endif
 				}
 				numbers = temporary_pointer;
 			}

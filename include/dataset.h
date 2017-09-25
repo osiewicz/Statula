@@ -25,7 +25,7 @@ struct dataset
 #define MODE_PRESENT (1 << 0)
 #define SORT (1 << 1)
 
-#include <statula.h>
+#include <misc.h>
 #include <operations.h>
 #include <io.h>
 
@@ -33,3 +33,4 @@ int init_dataset(struct dataset *set, unsigned int flags, const char *source);
 int free_dataset(struct dataset *set);
 int compute_dataset(struct dataset *set);
 int print_dataset(struct dataset *set, FILE *stream, struct settings *settings,const char *dataset_name);
+fpn *dataset_parse_default(char *buffer, int *num_count, fpn *numbers);
