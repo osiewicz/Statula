@@ -64,10 +64,12 @@ int mode(struct dataset *set)
 	}
 	if (mode_count == 1) {
 		set->mode = current_mode;
-		set->flags |= MODE_PRESENT;
+	} else if(mode_count == 0) {
+		set->mode = 0;
+		set->flags |= NO_MODE;
 	} else {
 		set->mode = 0;
-		set->flags &= ~MODE_PRESENT;
+		set->flags |= MULTIPLE_MODES;
 	}
 	return mode_count == 1 ? 0 : 1;
 }

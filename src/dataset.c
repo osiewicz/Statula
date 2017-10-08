@@ -91,7 +91,7 @@ int init_dataset(struct dataset *set, unsigned int flags, const char *source)
 #endif
 	}
 	set_defaults_dataset(set);
-	set->flags = (flags & ~MODE_PRESENT);
+	set->flags = (flags | NO_MODE);
 	set->numbers = read_data(source, &(set->number_count), &dataset_parse_default);
 	
 	if (!set->numbers) {
@@ -169,7 +169,7 @@ int print_dataset(struct dataset *set, FILE *stream, struct settings *settings,c
 	fprintf(stream, "\n--------\n%s %d\n%s %.*f\n%s %.*f\n%s ", text[0],
 			set->number_count, text[1], settings->precision, (set->mean), text[2],
 			settings->precision,(set->median), text[3]);
-	if ((set->flags & MODE_PRESENT)) {
+	if (!(set->flags & (NO_MODE | MULTIPLE_MODES))) {
 		fprintf(stream, "%.*f\n",settings->precision, (set->mode));
 	} else {
 		fprintf(stream, "%s\n", text[11]);
