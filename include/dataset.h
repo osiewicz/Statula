@@ -23,8 +23,8 @@ struct dataset
 };
 
 #define NO_MODE (1 << 0)
-#define MULTIPLE_MODES (1 << 2)
-#define SORT (1 << 1)
+#define MULTIPLE_MODES (1 << 1)
+#define SORT (1 << 2)
 
 #include <misc.h>
 #include <operations.h>
