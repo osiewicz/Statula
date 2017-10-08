@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 		process_file(settings,i);
 	}
 	
-	if ((settings->dataset_flags ^ SORT) & SORT) {
+	if ((settings->dataset_flags ^ STATULA_SORT) & STATULA_SORT) {
 		puts("\nWARNING: Median, mode and skewness could yield incorrect results due to the input not being sorted.\n");
 	}
 	

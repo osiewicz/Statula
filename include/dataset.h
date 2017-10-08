@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef REDUCED_PRECISION
+#ifdef STATULA_REDUCED_PRECISION
 typedef float fpn;
 #else
 typedef double fpn;
@@ -22,8 +22,8 @@ struct dataset
 	fpn skewness;
 };
 
-#define MODE_PRESENT (1 << 0)
-#define SORT (1 << 1)
+#define STATULA_MODE_PRESENT (1 << 0)
+#define STATULA_SORT (1 << 1)
 
 #include <misc.h>
 #include <operations.h>

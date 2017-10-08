@@ -91,7 +91,7 @@ int init_dataset(struct dataset *set, unsigned int flags, const char *source)
 #endif
 	}
 	set_defaults_dataset(set);
-	set->flags = (flags & ~MODE_PRESENT);
+	set->flags = (flags & ~STATULA_MODE_PRESENT);
 	set->numbers = read_data(source, &(set->number_count), &dataset_parse_default);
 	
 	if (!set->numbers) {
@@ -132,7 +132,7 @@ int compute_dataset(struct dataset *set)
 	 * Memory allocation responsibilities: None.
 	 */
 	
-	if ((set->flags & SORT) != 0) {
+	if ((set->flags & STATULA_SORT) != 0) {
 		quick_sort(set->numbers, set->number_count);
 	}
 	mean(set);
@@ -163,13 +163,13 @@ int print_dataset(struct dataset *set, FILE *stream, struct settings *settings,c
 	}
 	char **text = settings->strings->text;
 	
-	if(settings->flags & PRINT_FILE_NAME){
+	if(settings->flags & STATULA_PRINT_FILE_NAME){
 		fprintf(stream,"%s",dataset_name==NULL?"Standard input":dataset_name);
 	}
 	fprintf(stream, "\n--------\n%s %d\n%s %.*f\n%s %.*f\n%s ", text[0],
 			set->number_count, text[1], settings->precision, (set->mean), text[2],
 			settings->precision,(set->median), text[3]);
-	if ((set->flags & MODE_PRESENT)) {
+	if ((set->flags & STATULA_MODE_PRESENT)) {
 		fprintf(stream, "%.*f\n",settings->precision, (set->mode));
 	} else {
 		fprintf(stream, "%s\n", text[11]);
@@ -206,9 +206,9 @@ fpn *dataset_parse_default(char *buffer, int *num_count, fpn *numbers)
 		test = single_number;
 		dummy = strtod(single_number, &single_number);
 		if (test != single_number || dummy != 0.0) {
-			if (memory_exp * BUFFER_SIZE <= (*num_count)) {
+			if (memory_exp * STATULA_BUFFER_SIZE <= (*num_count)) {
 				memory_exp *= 2;
-				temporary_pointer = realloc(numbers, sizeof(fpn) * BUFFER_SIZE * memory_exp);
+				temporary_pointer = realloc(numbers, sizeof(fpn) * STATULA_BUFFER_SIZE * memory_exp);
 				if (!temporary_pointer) {
 #ifdef TEST
 					return NULL;
