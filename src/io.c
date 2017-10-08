@@ -178,7 +178,7 @@ void *read_data(const char *source, int *num_count, fpn *(*filter)(char *buffer,
 		if (fp  || source == NULL) {
 			fpn *numbers;
 			size_t size = 0;
-			numbers = malloc(sizeof(fpn) * BUFFER_SIZE);
+			numbers = malloc(sizeof(fpn) * STATULA_BUFFER_SIZE);
 			filter(NULL,NULL,NULL);//Reset memory counter in filter
 	
 			if (!numbers) {

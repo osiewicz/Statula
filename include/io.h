@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <dataset.h>
 
-#define BUFFER_SIZE 1024
+#define STATULA_BUFFER_SIZE 1024
 
 extern const char *progname;
 

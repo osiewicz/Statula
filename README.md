@@ -40,14 +40,14 @@ Following section might come in useful if you plan to familiarize yourself with 
 
 |   Bit  |   1  |       0      |
 |:------:|:----:|:------------:|
-| Option | SORT | MODE_PRESENT |  
+| Option | STATULA_SORT | STATULA_MODE_PRESENT |  
   
   
 **Statula:**  
   
 |   Bit  |       3         |      2     |   1   |        0        |
 |:------:|:---------------:|:----------:|:-----:|:---------------:|
-| Option | PRINT_FILE_NAME | PRINT_HELP | STDIN | PRINT_TO_STDOUT |
+| Option | STATULA_PRINT_FILE_NAME | STATULA_PRINT_HELP | STATULA_STDIN | STATULA_PRINT_TO_STDOUT |
   
 ***
 #### *QTYMCUW*

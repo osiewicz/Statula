@@ -21,7 +21,7 @@ statula: $(OBJ)
 .PHONY: clean reduced_precision
 
 reduced_precision: clean
-reduced_precision: CFLAGS+="-DREDUCED_PRECISION"
+reduced_precision: CFLAGS+="-DSTATULA_REDUCED_PRECISION"
 reduced_precision: statula
 
 clean:

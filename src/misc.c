@@ -33,7 +33,7 @@ int process_file(struct settings *settings, int index)
 	}
 	init_dataset(set, settings->dataset_flags, settings->input_files[index]);
 	compute_dataset(set);
-	if (settings->flags & PRINT_TO_STDOUT) {
+	if (settings->flags & STATULA_PRINT_TO_STDOUT) {
 		print_dataset(set, stdout, settings,settings->input_files[index]);
 	}
 	if (index<settings->out_file_count) {
@@ -59,13 +59,13 @@ void handle_flags(struct settings *settings)
 	 * Memory allocation responsibilities: None.
 	 */
 	
-	if (settings->flags & PRINT_TO_STDOUT) {
+	if (settings->flags & STATULA_PRINT_TO_STDOUT) {
 		printf("\nStatula %s\n", STATULA_VERSION);
 	}
-	if((settings->flags & PRINT_HELP) != 0){
+	if((settings->flags & STATULA_PRINT_HELP) != 0){
 		print_help();
 	}
-	if (settings->flags & STDIN) {
+	if (settings->flags & STATULA_STDIN) {
 		enable_stdin(settings);
 	}
 }
@@ -176,9 +176,9 @@ struct settings *init_settings(void)
 	result->flags = 0;
 	result->in_file_count = 0;
 	result->out_file_count = 0;
-	result->precision = DEFAULT_PRECISION;
-	result->flags |= (PRINT_TO_STDOUT);
-	result->dataset_flags |= (SORT);
+	result->precision = STATULA_DEFAULT_PRECISION;
+	result->flags |= (STATULA_PRINT_TO_STDOUT);
+	result->dataset_flags |= (STATULA_SORT);
 	return result;
 }
 
@@ -224,19 +224,19 @@ struct settings *parse_cmd_args(int argc,char **argv)
 		for (int i = 1; i < argc; i++) {
 			if (strncmp(argv[i], "-", 1) == 0) {
 				if(argc - i > 0 && is_valid_parameter(argv[i],"--print_name",NULL) == 1){
-					settings->flags |= PRINT_FILE_NAME;
+					settings->flags |= STATULA_PRINT_FILE_NAME;
 				} else if (argc - i > 0 && (is_valid_parameter(argv[i], "--stdin",NULL) == 1)) {
-					settings->flags |= STDIN;
+					settings->flags |= STATULA_STDIN;
 				} else if (argc - i > 0 && (is_valid_parameter(argv[i], "--help","-h") == 1)) {
-					settings->flags |= PRINT_HELP;
+					settings->flags |= STATULA_PRINT_HELP;
 				} else if (argc - i > 0 && (is_valid_parameter(argv[i], "--nosort",NULL) == 1)) {
-					settings->dataset_flags &= ~SORT;
+					settings->dataset_flags &= ~STATULA_SORT;
 				} else if (argc - i > 0 && (is_valid_parameter(argv[i], "--silent",NULL) == 1)) {
-					settings->flags &= ~PRINT_TO_STDOUT;
+					settings->flags &= ~STATULA_PRINT_TO_STDOUT;
 				} else if (argc - i > 1 && is_valid_parameter(argv[i],"--precision",NULL) == 1){
 					settings->precision = strtol(argv[i+1],NULL,10);
 					if(settings->precision<0){
-						settings->precision = DEFAULT_PRECISION;
+						settings->precision = STATULA_DEFAULT_PRECISION;
 					}
 					i++;
 				} else if (argc - i > 1 && (is_valid_parameter(argv[i], "--open","-o")==1)) {
@@ -290,7 +290,7 @@ struct settings *parse_cmd_args(int argc,char **argv)
 			}
 		}
 	} else if (argc == 1) {
-		settings->flags |= STDIN;
+		settings->flags |= STATULA_STDIN;
 	}
 	
 	settings->strings = init_strings(settings->language);

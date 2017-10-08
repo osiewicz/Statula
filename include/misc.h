@@ -4,12 +4,12 @@
 #define STATULA_VERSION "v0.1.13"
 
 //flags
-#define PRINT_TO_STDOUT (1 << 0)
-#define STDIN (1 << 1)
-#define PRINT_HELP (1<<2)
-#define PRINT_FILE_NAME (1<<3)
+#define STATULA_PRINT_TO_STDOUT (1 << 0)
+#define STATULA_STDIN (1 << 1)
+#define STATULA_PRINT_HELP (1<<2)
+#define STATULA_PRINT_FILE_NAME (1<<3)
 
-#define DEFAULT_PRECISION 6
+#define STATULA_DEFAULT_PRECISION 6
 
 struct strings;
 
