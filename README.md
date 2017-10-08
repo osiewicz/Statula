@@ -38,9 +38,9 @@ Following section might come in useful if you plan to familiarize yourself with 
   
 **Dataset:**  
 
-|   Bit  |   1  |       0      |
-|:------:|:----:|:------------:|
-| Option | SORT | MODE_PRESENT |  
+|   Bit  |   2  |        1       |    0    |
+|:------:|:----:|:--------------:|:-------:|
+| Option | SORT | MULTIPLE_MODES | NO_MODE |  
   
   
 **Statula:**  
