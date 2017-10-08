@@ -7,7 +7,7 @@ typedef double fpn;
 #endif
 struct dataset
 {
-	int flags : 2;
+	int flags : 3;
 	int number_count;
 	fpn *numbers;
 	fpn mean;
@@ -22,8 +22,9 @@ struct dataset
 	fpn skewness;
 };
 
-#define MODE_PRESENT (1 << 0)
-#define SORT (1 << 1)
+#define NO_MODE (1 << 0)
+#define MULTIPLE_MODES (1 << 1)
+#define SORT (1 << 2)
 
 #include <misc.h>
 #include <operations.h>
