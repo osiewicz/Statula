@@ -1,14 +1,14 @@
 #pragma once
 
-#ifdef REDUCED_PRECISION
+#ifdef STATULA_REDUCED_PRECISION
 typedef float fpn;
 #else
 typedef double fpn;
 #endif
 struct dataset
 {
-	int flags : 2;
-	int number_count;
+	unsigned flags : 3;
+	unsigned long long number_count;
 	fpn *numbers;
 	fpn mean;
 	fpn median;
@@ -22,8 +22,9 @@ struct dataset
 	fpn skewness;
 };
 
-#define MODE_PRESENT (1 << 0)
-#define SORT (1 << 1)
+#define STATULA_NO_MODE (1 << 0)
+#define STATULA_MULTIPLE_MODES (1 << 1)
+#define STATULA_SORT (1 << 2)
 
 #include <misc.h>
 #include <operations.h>
@@ -33,4 +34,4 @@ int init_dataset(struct dataset *set, unsigned int flags, const char *source);
 int free_dataset(struct dataset *set);
 int compute_dataset(struct dataset *set);
 int print_dataset(struct dataset *set, FILE *stream, struct settings *settings,const char *dataset_name);
-fpn *dataset_parse_default(char *buffer, int *num_count, fpn *numbers);
+fpn *dataset_parse_default(char *buffer, unsigned long long *num_count, fpn *numbers);

@@ -1,6 +1,6 @@
 #include "dataset.h"
 
-static void quick_sort(fpn *arr, int elements)
+static int quick_sort(fpn *arr, unsigned elements)
 {
 	/* public-domain implementation by Darel Rex Finley.
 	 * Responsibilities:
@@ -8,6 +8,22 @@ static void quick_sort(fpn *arr, int elements)
 	 * Memory allocation responsibilities: None.
 	 */
 	
+	if(arr == NULL){
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"quick_sort: NULL pointer passed : ");
+#endif
+	}
+	
+	if(elements < 1){
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_GENERAL;
+#else
+		eprintf(STATULA_FAIL_GENERAL,"quick_sort: Invalid number count : ");
+#endif
+	}
+		
 	const int max_levels = 300;
 	fpn piv;
 	int beg[max_levels], end[max_levels], i = 0, L, R, swap;
@@ -51,16 +67,24 @@ static void quick_sort(fpn *arr, int elements)
 			i--;
 		}
 	}
+	return STATULA_SUCCESS;
 }
 
-static void set_defaults_dataset(struct dataset *set)
+static int set_defaults_dataset(struct dataset *set)
 {
 	/* Responsibilities:
 	 * Sets set struct to default values.
 	 * Memory allocation responsibilites: None.
 	 */
 	
-	set->number_count = 0;
+	if(set == NULL) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"set_defaults_dataset: NULL pointer passed : ");
+#endif
+	}
+	set->number_count = 0 ;
 	set->flags = 0;
 	set->numbers = NULL;
 	set->mean = 0;
@@ -73,6 +97,7 @@ static void set_defaults_dataset(struct dataset *set)
 	set->coefficient_of_variation = 0;
 	set->kurtosis = 0;
 	set->skewness = 0;
+	return STATULA_SUCCESS;
 }
 
 int init_dataset(struct dataset *set, unsigned int flags, const char *source)
@@ -84,32 +109,32 @@ int init_dataset(struct dataset *set, unsigned int flags, const char *source)
 	 */
 	
 	if(set == NULL){
-#ifdef TEST
-		return -1;
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
 #else
-		eprintf("init_dataset: NULL pointer passed: ");
+		eprintf(STATULA_FAIL_NULL,"init_dataset: NULL pointer passed: ");
 #endif
 	}
 	set_defaults_dataset(set);
-	set->flags = (flags & ~MODE_PRESENT);
+	set->flags |= (flags | STATULA_NO_MODE);
 	set->numbers = read_data(source, &(set->number_count), &dataset_parse_default);
 	
 	if (!set->numbers) {
-#ifdef TEST
-		return -2;
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_MEMORY;
 #else
-		eprintf("init_dataset: Failed to allocate memory for data: ");
+		eprintf(STATULA_FAIL_MEMORY,"init_dataset: Failed to allocate memory for data: ");
 #endif
 	}
 	
 	if (set->number_count <= 0) {
-#ifdef TEST
-		return -3;
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_MATH;
 #else
-		eprintf("init_dataset: Invalid number count: ");
+		eprintf(STATULA_FAIL_MATH,"init_dataset: Invalid number count: ");
 #endif
 	}
-	return 0;
+	return STATULA_SUCCESS;
 }
 
 int free_dataset(struct dataset *set)
@@ -119,10 +144,17 @@ int free_dataset(struct dataset *set)
 	 * Memory allocation responsibilities: None.
 	 */
 	
+	if(set == NULL) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"free_dataset: NULL pointer passed : ");
+#endif
+	}
 	free(set->numbers);
 	set_defaults_dataset(set);
 	free(set);
-	return 0;
+	return STATULA_SUCCESS;
 }
 
 int compute_dataset(struct dataset *set)
@@ -132,7 +164,14 @@ int compute_dataset(struct dataset *set)
 	 * Memory allocation responsibilities: None.
 	 */
 	
-	if ((set->flags & SORT) != 0) {
+	if(set == NULL){
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL, "compute_dataset: NULL pointer passed : ");
+#endif
+	}
+	if ((set->flags & STATULA_SORT) != 0) {
 		quick_sort(set->numbers, set->number_count);
 	}
 	mean(set);
@@ -145,7 +184,7 @@ int compute_dataset(struct dataset *set)
 	coefficient_of_variation(set);
 	kurtosis(set);
 	skewness(set);
-	return 0;
+	return STATULA_SUCCESS;
 }
 
 int print_dataset(struct dataset *set, FILE *stream, struct settings *settings,const char *dataset_name)
@@ -155,21 +194,21 @@ int print_dataset(struct dataset *set, FILE *stream, struct settings *settings,c
 	 * Memory allocation responsibilities: None.
 	 */
 	if(settings == NULL || set == NULL || stream == NULL){
-#ifdef TEST
-		return -1;
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
 #else
-		eprintf("print_dataset: NULL pointer passed: ");
+		eprintf(STATULA_FAIL_NULL,"print_dataset: NULL pointer passed: ");
 #endif
 	}
 	char **text = settings->strings->text;
 	
-	if(settings->flags & PRINT_FILE_NAME){
+	if(settings->flags & STATULA_PRINT_FILE_NAME){
 		fprintf(stream,"%s",dataset_name==NULL?"Standard input":dataset_name);
 	}
-	fprintf(stream, "\n--------\n%s %d\n%s %.*f\n%s %.*f\n%s ", text[0],
+	fprintf(stream, "\n--------\n%s %llu\n%s %.*f\n%s %.*f\n%s ", text[0],
 			set->number_count, text[1], settings->precision, (set->mean), text[2],
 			settings->precision,(set->median), text[3]);
-	if ((set->flags & MODE_PRESENT)) {
+	if ((set->flags & STATULA_NO_MODE) == 0 && (set->flags & STATULA_MULTIPLE_MODES) == 0) {
 		fprintf(stream, "%.*f\n",settings->precision, (set->mode));
 	} else {
 		fprintf(stream, "%s\n", text[11]);
@@ -179,10 +218,10 @@ int print_dataset(struct dataset *set, FILE *stream, struct settings *settings,c
 			text[6], settings->precision, (set->std_deviation), text[7], settings->precision, (set->m_abs_deviation),
 			text[8], settings->precision, (set->coefficient_of_variation),
 			text[9], settings->precision, (set->kurtosis), text[10], settings->precision, (set->skewness));
-	return 0;
+	return STATULA_SUCCESS;
 }
 
-fpn *dataset_parse_default(char *buffer, int *num_count, fpn *numbers)
+fpn *dataset_parse_default(char *buffer, unsigned long long *num_count, fpn *numbers)
 {
 	/* Responsibilities:
 	 * Extracts floating point numbers from 'buffer', increments num_count
@@ -200,20 +239,22 @@ fpn *dataset_parse_default(char *buffer, int *num_count, fpn *numbers)
 	fpn *temporary_pointer = NULL;
 	if(buffer==NULL && num_count == NULL && numbers == NULL){
 		memory_exp = 1;
+	}
+	if(buffer == NULL || num_count == NULL || numbers == NULL){
 		return NULL;
 	}
 	do {
 		test = single_number;
 		dummy = strtod(single_number, &single_number);
 		if (test != single_number || dummy != 0.0) {
-			if (memory_exp * BUFFER_SIZE <= (*num_count)) {
+			if (memory_exp * STATULA_BUFFER_SIZE <= (*num_count)) {
 				memory_exp *= 2;
-				temporary_pointer = realloc(numbers, sizeof(fpn) * BUFFER_SIZE * memory_exp);
+				temporary_pointer = realloc(numbers, sizeof(fpn) * STATULA_BUFFER_SIZE * memory_exp);
 				if (!temporary_pointer) {
-#ifdef TEST
+#ifdef STATULA_TESTS
 					return NULL;
 #else
-					eprintf("read_data: Failed to reallocate memory for data array:");
+					eprintf(STATULA_FAIL_MEMORY,"read_data: Failed to reallocate memory for data array:");
 #endif
 				}
 				numbers = temporary_pointer;

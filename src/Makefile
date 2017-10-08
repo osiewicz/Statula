@@ -13,6 +13,10 @@ DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 _OBJ = misc.o io.o dataset.o operations.o statula.o 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
+ifeq ($(prefix),)
+	prefix:=/usr/local
+endif
+
 $(ODIR)/%.o: %.c $(DEPS) 
 	$(CC) $< $(CFLAGS) -c -o $@ 
 
@@ -26,3 +30,6 @@ reduced_precision: statula
 
 clean:
 	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~
+
+install: statula
+	install -m 0755 statula $(prefix)/bin

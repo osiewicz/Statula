@@ -8,7 +8,14 @@
 #include <unistd.h>
 #include <dataset.h>
 
-#define BUFFER_SIZE 1024
+#define STATULA_BUFFER_SIZE 1024
+
+#define STATULA_SUCCESS 0
+#define STATULA_FAIL_NULL 1
+#define STATULA_FAIL_MEMORY 2
+#define STATULA_FAIL_IO 3
+#define STATULA_FAIL_GENERAL 4
+#define STATULA_FAIL_MATH 5
 
 extern const char *progname;
 
@@ -21,5 +28,5 @@ struct strings{
 char **load_strings(const char *language,int *count);
 struct strings *init_strings(const char *language);
 int free_strings(struct strings *strings);
-void *read_data(const char *source, int *num_count, fpn *(*filter)(char *buffer, int *num_count, fpn *numbers));
-void eprintf(char *fmt, ...);
+void *read_data(const char *source, unsigned long long *num_count, fpn *(*filter)(char *buffer, unsigned long long *num_count, fpn *numbers));
+unsigned eprintf(unsigned err_code, char *fmt, ...);

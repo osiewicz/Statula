@@ -10,15 +10,26 @@ int mean(struct dataset *set)
 	 * Memory allocation responsibilities: None.
 	 */
 	
-	if (set->number_count < 1) {
-		return 1;
+	if (!set) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"mean: NULL pointer passed :");
+#endif
+	}
+	if(set->number_count < 1){
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_GENERAL;
+#else
+		eprintf(STATULA_FAIL_NULL,"mean: Invalid input : ");
+#endif
 	}
 	long double sum = 0;
 	for (int i = 0; i < set->number_count; i++) {
 		sum += set->numbers[i];
 	}
 	set->mean = sum / set->number_count;
-	return 0;
+	return STATULA_SUCCESS;
 }
 
 int median(struct dataset *set)
@@ -28,15 +39,26 @@ int median(struct dataset *set)
 	 * Memory allocation responsibilities: None.
 	 */
 	
-	if (set->number_count < 1) {
-		return 1;
+	if (!set) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"median: NULL pointer passed :");
+#endif
+	}
+	if(set->number_count < 1){
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_GENERAL;
+#else
+		eprintf(STATULA_FAIL_GENERAL,"median: Invalid input : ");
+#endif
 	}
 	if (set->number_count % 2 == 0) {
 		set->median = (set->numbers[(set->number_count) / 2] + set->numbers[(set->number_count) / 2 - 1]) / 2;
 	} else {
 		set->median = set->numbers[(set->number_count - 1) / 2];
 	}
-	return 0;
+	return STATULA_SUCCESS;
 }
 
 int mode(struct dataset *set)
@@ -45,10 +67,27 @@ int mode(struct dataset *set)
 	 * Calculates mode for given dataset. Relies on dataset being sorted.
 	 * Memory allocation responsibilities: None.
 	 */
+	if (!set) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"mode: NULL pointer passed : ");
+#endif
+	}
+	if(set->number_count == 0) {
+		set->mode = 0;
+		set->flags &= (~STATULA_MULTIPLE_MODES);
+		set->flags |= STATULA_NO_MODE; 
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_GENERAL;
+#else
+		eprintf(STATULA_FAIL_GENERAL,"mode: Invalid input : ");
+#endif
+	}
 	
 	double current_mode = 0;
 	int max_count = 0, j, mode_count = 0;
-	for (int i = 0; i + max_count - 1 < set->number_count; i++) {
+	for (int i = 0; i < set->number_count; i++) {
 		int count = 0;
 		for (j = i + 1; j < set->number_count && set->numbers[j] == set->numbers[i]; j++)
 			{ }
@@ -64,12 +103,14 @@ int mode(struct dataset *set)
 	}
 	if (mode_count == 1) {
 		set->mode = current_mode;
-		set->flags |= MODE_PRESENT;
+		set->flags &= ~(STATULA_MULTIPLE_MODES);
+		set->flags &= ~(STATULA_NO_MODE);
 	} else {
 		set->mode = 0;
-		set->flags &= ~MODE_PRESENT;
+		set->flags &= (~STATULA_NO_MODE);
+		set->flags |= STATULA_MULTIPLE_MODES;
 	}
-	return mode_count == 1 ? 0 : 1;
+	return STATULA_SUCCESS;
 }
 
 int range(struct dataset *set)
@@ -78,7 +119,22 @@ int range(struct dataset *set)
 	 * Calculates range of given dataset.
 	 * Memory allocation responsibilities: None.
 	 */
+
+	if (!set) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"range: Invalid input:");
+#endif
+	}
 	
+	if (set->number_count < 1) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_GENERAL;
+#else
+		eprintf(STATULA_FAIL_GENERAL,"range: Invalid input:");
+#endif
+	}
 	double max = set->numbers[0];
 	double min = set->numbers[0];
 	for (int i = 0; i < set->number_count; i++) {
@@ -89,7 +145,7 @@ int range(struct dataset *set)
 		}
 	}
 	set->range = fabs(max - min);
-	return 0;
+	return STATULA_SUCCESS;
 }
 
 int central_moment(struct dataset *set, int degree)
@@ -98,9 +154,22 @@ int central_moment(struct dataset *set, int degree)
 	 * Calculates central moment of given degree for passed dataset.
 	 * Memory allocation responsibilities: None.
 	 */
-	
+	if (!set) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"central_moment: NULL pointer passed : ");
+#endif
+	}
+	if (set->number_count < 1) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_GENERAL;
+#else
+		eprintf(STATULA_FAIL_GENERAL,"central_moment: Invalid input:");
+#endif
+	}
 	if (degree < 1) {
-		return 1;
+		return STATULA_FAIL_GENERAL;
 	}
 	double c_moment = 0;
 	
@@ -113,7 +182,7 @@ int central_moment(struct dataset *set, int degree)
 	} else if (degree == 4) {
 		set->kurtosis = c_moment;
 	}
-	return 0;
+	return STATULA_SUCCESS;
 }
 
 int std_deviation(struct dataset *set)
@@ -122,9 +191,22 @@ int std_deviation(struct dataset *set)
 	 * Calculates standard deviation of given dataset.
 	 * Memory allocation responsibilities: None.
 	 */
-	
+	if (!set) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"std_deviation: Invalid input:");
+#endif
+	}
+	if (!set || set->number_count < 1) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_GENERAL;
+#else
+		eprintf(STATULA_FAIL_GENERAL,"std_deviation: Invalid input:");
+#endif
+	}
 	set->std_deviation = sqrt(set->central_moment);
-	return 0;
+	return STATULA_SUCCESS;
 }
 
 int m_abs_deviation(struct dataset *set)
@@ -133,13 +215,26 @@ int m_abs_deviation(struct dataset *set)
 	 * Calculates mean absolute deviation of given dataset.
 	 * Memory allocation responsibilities: None.
 	 */
-	
+	if (!set) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"m_abs_deviation: NULL pointer passed :");
+#endif
+	}
+	if (!set || set->number_count < 1) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_GENERAL;
+#else
+		eprintf(STATULA_FAIL_GENERAL,"m_abs_deviation: Invalid input:");
+#endif
+	}
 	double m_o_d = 0;
 	for (int i = 0; i < set->number_count; i++) {
 		m_o_d += fabs(set->numbers[i] - set->mean);
 	}
 	set->m_abs_deviation = m_o_d / set->number_count;
-	return 0;
+	return STATULA_SUCCESS;
 }
 
 int coefficient_of_variation(struct dataset *set)
@@ -148,13 +243,26 @@ int coefficient_of_variation(struct dataset *set)
 	 * Calculates coefficient of variation for given dataset.
 	 * Memory allocation responsibilities: None.
 	 */
-	
+	if (!set) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"coefficient_of_variation: NULL pointer passed :");
+#endif
+	}
+	if (set->number_count < 1) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_GENERAL;
+#else
+		eprintf(STATULA_FAIL_GENERAL,"coefficient_of_variation: Invalid input:");
+#endif
+	}
 	if (set->mean == 0) {
 		set->coefficient_of_variation = 0;
-		return 1;
+		return STATULA_FAIL_MATH;
 	}
 	set->coefficient_of_variation = (set->std_deviation / set->mean) * 100;
-	return 0;
+	return STATULA_SUCCESS;
 }
 
 int kurtosis(struct dataset *set)
@@ -163,13 +271,26 @@ int kurtosis(struct dataset *set)
 	 * Calculates kurtosis of given dataset.
 	 * Memory allocation responsibilities: None.
 	 */
-	
+	if (!set) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"kurtosis: NULL pointer passed :");
+#endif
+	}
+	if (set->number_count < 1) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_GENERAL;
+#else
+		eprintf(STATULA_FAIL_GENERAL,"kurtosis: Invalid input:");
+#endif
+	}
 	central_moment(set, 4);
 	if (set->std_deviation == 0) {
-		return 1;
+		return STATULA_FAIL_MATH;
 	}
 	set->kurtosis = set->kurtosis / pow(set->std_deviation, 4) - 3;
-	return 0;
+	return STATULA_SUCCESS;
 }
 
 int skewness(struct dataset *set)
@@ -178,12 +299,25 @@ int skewness(struct dataset *set)
 	 * Calculates skewness of given dataset. Relies on dataset being sorted.
 	 * Memory allocation responsibilities: None.
 	 */
-	
+	if (!set) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"skewness: Invalid input:");
+#endif
+	}
+	if (set->number_count < 1) {
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_GENERAL;
+#else
+		eprintf(STATULA_FAIL_GENERAL,"skewness: Invalid input:");
+#endif
+	}
 	if (set->std_deviation == 0) {
-		return 1;
+		return STATULA_FAIL_MATH;
 	}
 	set->skewness = 3 * ((set->mean - (set->median)) / (set->std_deviation));
-	return !(set->skewness <= 1 && set->skewness >= -1);
+	return (set->skewness <= 1 && set->skewness >= -1) ? STATULA_SUCCESS : STATULA_FAIL_MATH;
 }
 
 /*** Peripheral ***/

@@ -3,7 +3,7 @@
 ***
 
 ### Simple terminal-based program for descriptive statistics
-##### *Current version: 0.1.13*
+##### *Current version: 0.1.14*
 [![Build Status](https://travis-ci.org/PiotrOsiewicz/Statula.svg?branch=master)](https://travis-ci.org/PiotrOsiewicz/Statula)
 [![license](https://img.shields.io/github/license/PiotrOsiewicz/statula.svg)]()
 
@@ -38,9 +38,9 @@ Following section might come in useful if you plan to familiarize yourself with 
   
 **Dataset:**  
 
-|   Bit  |   1  |       0      |
-|:------:|:----:|:------------:|
-| Option | SORT | MODE_PRESENT |  
+|   Bit  |   2  |        1       |    0    |
+|:------:|:----:|:--------------:|:-------:|
+| Option | SORT | MULTIPLE_MODES | NO_MODE |  
   
   
 **Statula:**  

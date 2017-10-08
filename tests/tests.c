@@ -13,11 +13,11 @@ const double epsilon = 0.0001;
 Test(dataset, 0s)
 {
 	struct dataset *test = malloc(sizeof(struct dataset));
-	init_dataset(test, 0, "datasets/test_0");
+	init_dataset(test, STATULA_SORT, "datasets/test_0");
 	compute_dataset(test);
 	cr_assert(test->number_count == 1);
 	cr_assert(test->mean == 0);
-	cr_assert((test->flags & MODE_PRESENT) != 0);
+	cr_assert((test->flags & (STATULA_MULTIPLE_MODES | STATULA_NO_MODE)) == 0);
 	cr_assert(test->range == 0);
 	cr_assert(test->central_moment == 0);
 	cr_assert(test->std_deviation == 0);
@@ -35,7 +35,7 @@ Test(dataset, 0)
 	cr_assert(test->number_count == 1);
 	cr_assert(test->mean == 0);
 	cr_assert(test->median == 0);
-	cr_assert((test->flags & MODE_PRESENT) != 0);
+	cr_assert((test->flags & (STATULA_MULTIPLE_MODES | STATULA_NO_MODE)) == 0);
 	cr_assert(test->mode == 0);
 	cr_assert(test->range == 0);
 	cr_assert(test->central_moment == 0);
@@ -50,12 +50,12 @@ Test(dataset, 0)
 Test(dataset, 1s)
 {
 	struct dataset *test = malloc(sizeof(struct dataset));
-	init_dataset(test, SORT, "datasets/test_1");
+	init_dataset(test, STATULA_SORT, "datasets/test_1");
 	compute_dataset(test);
 	cr_assert(test->number_count == 6);
 	cr_assert(test->mean == 3.5);
 	cr_assert(test->median == 3.5);
-	cr_assert((test->flags & MODE_PRESENT) == 0);
+	cr_assert((test->flags & STATULA_MULTIPLE_MODES) != 0);
 	cr_assert(test->range == 5);
 	cr_assert_float_eq(test->central_moment, 2.91666, epsilon);
 	cr_assert_float_eq(test->std_deviation, 1.70782512766, epsilon);
@@ -85,12 +85,12 @@ Test(dataset, 1)
 Test(dataset,2s)
 {
 	struct dataset *test = malloc(sizeof(struct dataset));
-	init_dataset(test, SORT, "datasets/test_2");
+	init_dataset(test, STATULA_SORT, "datasets/test_2");
 	compute_dataset(test);
 	cr_assert(test->number_count == 6);
 	cr_assert_float_eq(test->mean, 137.528, epsilon);
 	cr_assert_float_eq(test->median, 4.2, epsilon);
-	cr_assert((test->flags & MODE_PRESENT) == 1);
+	cr_assert((test->flags & (STATULA_MULTIPLE_MODES | STATULA_NO_MODE)) == 0);
 	cr_assert_float_eq(test->mode, 4.2, epsilon);
 	cr_assert_float_eq(test->range, 771.768, epsilon);
 	cr_assert_float_eq(test->central_moment, 80010.96886, epsilon);
@@ -105,7 +105,7 @@ Test(dataset,2s)
 Test(dataset,2)
 {
 	struct dataset *test = malloc(sizeof(struct dataset));
-	init_dataset(test, SORT, "datasets/test_2");
+	init_dataset(test, STATULA_SORT, "datasets/test_2");
 	compute_dataset(test);
 	cr_assert(test->number_count == 6);
 	cr_assert_float_eq(test->mean, 137.528, epsilon);
@@ -124,11 +124,12 @@ Test(load_strings,MissingFile)
 {
 	int mock_count = 0;
 	cr_assert(load_strings("ThatsNotInThisFolder",&mock_count) == NULL);
+	cr_assert(load_strings(NULL,&mock_count) == 0);
+	cr_assert(load_strings("NotInAFolder",NULL) == 0);
 }
 
 Test(init_strings,ProperFile)
 {
-	int mock_count = 0;
 	struct strings *test = init_strings("en-gb");
 	cr_assert(test != NULL);
 	free_strings(test);
@@ -136,7 +137,7 @@ Test(init_strings,ProperFile)
 
 Test(read_data,MissingFile)
 {
-	int mock_count = 0;
+	unsigned long long mock_count = 0;
 	
 	cr_assert(read_data("ThatsNotInThisFolder", &mock_count, &dataset_parse_default) == NULL);
 }
@@ -150,24 +151,26 @@ Test(free_strings,NULLptr)
 
 Test(init_dataset,NULLptr)
 {
-	cr_assert(init_dataset(NULL,0,"ThatsNotInThisFolder") == -1);
+	cr_assert(init_dataset(NULL,0,"ThatsNotInThisFolder") == STATULA_FAIL_NULL);
 }
 
 Test(init_dataset,EmptySet)
 {
 	struct dataset *mock = malloc(sizeof(struct dataset));
-	cr_assert(init_dataset(mock, 0,"datasets/test_3") == -3);
+	cr_assert(init_dataset(mock, 0,"datasets/test_3") == STATULA_FAIL_MATH);
 	free(mock);
 }
 
 Test(print_dataset,NULLptr)
 {
-	cr_assert(print_dataset(NULL,NULL,NULL,NULL) == -1);
+	cr_assert(print_dataset(NULL,NULL,NULL,NULL) == STATULA_FAIL_NULL);
 }
+
+/* misc.c tests */
 
 Test(enable_stdin,NULLptr)
 {
-	cr_assert(enable_stdin(NULL) == -1);
+	cr_assert(enable_stdin(NULL) == STATULA_FAIL_NULL);
 }
 
 Test(parse_cmd_args,NULLptr)
@@ -178,7 +181,7 @@ Test(parse_cmd_args,NULLptr)
 	free(mock);
 }
 
-Test(parse_cmd_args,Valid)
+Test(parse_cmd_args,Valid1)
 {
 	char **mock = malloc(sizeof(char*));
 	mock[0] = malloc(sizeof(char)*5);
@@ -186,8 +189,47 @@ Test(parse_cmd_args,Valid)
 	mock[0][4] = '\0';
 	struct settings *settings = parse_cmd_args(1,mock);
 	cr_assert(settings != NULL);
-	cr_assert((settings->flags & STDIN) != 0);
+	cr_assert((settings->flags & STATULA_STDIN) != 0);
 	free(mock[0]);
 	free(mock);
 	free_settings(settings);
+}
+
+Test(parse_cmd_args,ValidDefaultName)
+{
+	char **mock = malloc(sizeof(char*)*2);
+	mock[0] = malloc(sizeof(char)*5);
+	strcpy(mock[0],"./wh");
+	mock[0][4] = '\0';
+	mock[1] = malloc(sizeof(char)*16);
+	strcpy(mock[1],"datasets/test_0");
+	mock[1][15]='\0';
+	struct settings *settings = parse_cmd_args(2,mock);
+	cr_assert(settings != NULL);
+	cr_assert(settings->in_file_count == 1);
+	
+	for(int i=0;i<2;i++){
+		free(mock[i]);
+	}
+	free(mock);
+	free_settings(settings);
+}
+
+Test(is_valid_parameter,Suite)
+{
+	cr_assert(is_valid_parameter(NULL,NULL,NULL) == 0);
+	cr_assert(is_valid_parameter("-l","--language","-l") == 1);
+	cr_assert(is_valid_parameter("--aw","--aw","-a") == 1);
+}
+
+Test(is_argument,Suite)
+{
+	cr_assert(is_argument(NULL) == 0);
+	cr_assert(is_argument("-l") == 0);
+	cr_assert(is_argument("test") == 1);
+}
+
+Test(eprintf,NULLptr)
+{
+//	cr_assert(eprintf(NULL) == 1);
 }

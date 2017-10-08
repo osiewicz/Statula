@@ -10,30 +10,30 @@ int process_file(struct settings *settings, int index)
 	 * Memory allocation responsibilities: None.
 	 */
 	if(settings == NULL){
-#ifdef TEST
-		return -1;
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
 #else
-		eprintf("process_file: NULL pointer passed:");
+		eprintf(STATULA_FAIL_NULL,"process_file: NULL pointer passed:");
 #endif
 	}
 	if(index >= settings->in_file_count || index<0){
-#ifdef TEST
-		return -2;
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_GENERAL;
 #else
-		eprintf("process_file: Invalid parameters:");
+		eprintf(STATULA_FAIL_GENERAL,"process_file: Invalid parameters:");
 #endif
 	}
 	struct dataset *set = malloc(sizeof(struct dataset));
 	if(set == NULL){
-#ifdef TEST
-		return -3;
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_MEMORY;
 #else
-		eprintf("process_file: Failed to allocate memory for set.");
+		eprintf(STATULA_FAIL_MEMORY,"process_file: Failed to allocate memory for set.");
 #endif
 	}
 	init_dataset(set, settings->dataset_flags, settings->input_files[index]);
 	compute_dataset(set);
-	if (settings->flags & PRINT_TO_STDOUT) {
+	if (settings->flags & STATULA_PRINT_TO_STDOUT) {
 		print_dataset(set, stdout, settings,settings->input_files[index]);
 	}
 	if (index<settings->out_file_count) {
@@ -42,32 +42,41 @@ int process_file(struct settings *settings, int index)
 			print_dataset(set, save_file, settings,settings->input_files[index]);
 			fclose(save_file);
 		} else {
-#ifdef TEST
-			return -4;
+#ifdef STATULA_TESTS
+			return STATULA_FAIL_IO;
 #else
-			eprintf("process_file: Failed to create file '%s':", settings->output_files[index]);
+			eprintf(STATULA_FAIL_IO,"process_file: Failed to create file '%s':", settings->output_files[index]);
 #endif
 		}
 	}
 	free_dataset(set);
+	return STATULA_SUCCESS;
 }
 
-void handle_flags(struct settings *settings)
+int handle_flags(struct settings *settings)
 {
 	/* Responsibilities: 
 	 * Calling appropiate functions if given flag is (not) set.
 	 * Memory allocation responsibilities: None.
 	 */
 	
-	if (settings->flags & PRINT_TO_STDOUT) {
+	if(settings == NULL){
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"handle_flags: NULL pointer passed : ");
+#endif
+	}
+	if (settings->flags & STATULA_PRINT_TO_STDOUT) {
 		printf("\nStatula %s\n", STATULA_VERSION);
 	}
-	if((settings->flags & PRINT_HELP) != 0){
+	if((settings->flags & STATULA_PRINT_HELP) != 0){
 		print_help();
 	}
-	if (settings->flags & STDIN) {
+	if (settings->flags & STATULA_STDIN) {
 		enable_stdin(settings);
 	}
+	return STATULA_SUCCESS;
 }
 
 int enable_stdin(struct settings *settings)
@@ -79,26 +88,26 @@ int enable_stdin(struct settings *settings)
 	 */
 	
 	if(settings == NULL){
-#ifdef TEST
-		return -1;
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_NULL;;
 #else
-		eprintf("enable_stdin: NULL pointer passed:");
+		eprintf(STATULA_FAIL_NULL,"enable_stdin: NULL pointer passed:");
 #endif
 	}
 	char** alloc_temp;
 	alloc_temp = realloc(settings->input_files, sizeof(char *) * (settings->in_file_count+1));
 	if (!alloc_temp) {
-#ifdef TEST
-		return -2;
+#ifdef STATULA_TESTS
+		return STATULA_FAIL_MEMORY;
 #else
-		eprintf("enable_stdin: Failed to allocate memory");
+		eprintf(STATULA_FAIL_MEMORY,"enable_stdin: Failed to allocate memory : ");
 #endif
 	}
 	settings->in_file_count++;
 	settings->input_files = alloc_temp;
 	alloc_temp = NULL;
 	settings->input_files[settings->in_file_count - 1] = NULL;
-	return 0;
+	return STATULA_SUCCESS;
 }
 
 void print_help(void)
@@ -127,7 +136,7 @@ void print_help(void)
 	then it shall be used as a default filename for the session.\n\n");
 }
 
-int is_argument(char *argument)
+int is_argument(const char *argument)
 {
 	/* Responsibilities:
 	 * Checks whether argument meets argument criteria - not being NULL and
@@ -138,13 +147,17 @@ int is_argument(char *argument)
 	return argument == NULL || strncmp(argument,"-",1) == 0 ?0:1;
 }
 
-int is_valid_parameter(char *parameter,char *long_form, char *short_form)
+int is_valid_parameter(const char *parameter, const char *long_form, const char *short_form)
 {
 	/* Responsibilities:
 	 * Compares long_form and short_form with parameter and returns 1
 	 * if either one of them is equal to parameter.
 	 * Memory allocation responsibilities: None.
 	 */
+	if(parameter == NULL)
+	{
+		return 0;
+	}
 	
 	int short_result = 1;
 	int long_result = 1;
@@ -165,7 +178,6 @@ struct settings *init_settings(void)
 	 */
 	
 	struct settings *result = malloc(sizeof(struct settings));
-
 	if(!result){
 		return NULL;
 	}
@@ -176,9 +188,9 @@ struct settings *init_settings(void)
 	result->flags = 0;
 	result->in_file_count = 0;
 	result->out_file_count = 0;
-	result->precision = DEFAULT_PRECISION;
-	result->flags |= (PRINT_TO_STDOUT);
-	result->dataset_flags |= (SORT);
+	result->precision = STATULA_DEFAULT_PRECISION;
+	result->flags |= (STATULA_PRINT_TO_STDOUT);
+	result->dataset_flags |= (STATULA_SORT);
 	return result;
 }
 
@@ -188,6 +200,13 @@ void free_settings(struct settings *settings)
 	 * Cleans up settings structure.
 	 * Memory allocation responsibilities: None.
 	 */
+	if(!settings){
+#ifdef STATULA_TESTS
+		return;
+#else
+		eprintf(STATULA_FAIL_NULL,"free_settings: NULL pointer passed.");
+#endif
+	}
 	
 	free(settings->output_files);
 	free(settings->input_files);
@@ -202,41 +221,48 @@ struct settings *parse_cmd_args(int argc,char **argv)
 	 * Memory allocation responsibilities: Delegated to other functions.
 	 */
 	
-	if(argv == NULL || argc <= 0)
+	if(argv == NULL)
 	{
-#ifdef TEST
+#ifdef STATULA_TESTS
 		return NULL;
 #else
-		eprintf("parse_cmd_args: NULL pointer passed:");
+		eprintf(STATULA_FAIL_NULL,"parse_cmd_args: NULL pointer passed:");
+#endif
+	}
+	if(argc <= 0){
+#ifdef STATULA_TESTS
+		return NULL;
+#else
+		eprintf(STATULA_FAIL_GENERAL,"parse_cmd_args: Invalid argument count : ");
 #endif
 	}
 	
 	struct settings *settings = init_settings();
 	if(!settings){
-#ifdef TEST
+#ifdef STATULA_TESTS
 		return NULL;
 #else
-		eprintf("parse_cmd_args: Memory allocation fail:");
+		eprintf(STATULA_FAIL_GENERAL,"parse_cmd_args: init_settings fail : ");
 #endif
 	}
 	int t = 1;
 	if (argc > 1) {
 		for (int i = 1; i < argc; i++) {
-			if (strncmp(argv[i], "-", 1) == 0) {
+			if (argv[i] != NULL && is_argument(argv[i]) == 0) {
 				if(argc - i > 0 && is_valid_parameter(argv[i],"--print_name",NULL) == 1){
-					settings->flags |= PRINT_FILE_NAME;
+					settings->flags |= STATULA_PRINT_FILE_NAME;
 				} else if (argc - i > 0 && (is_valid_parameter(argv[i], "--stdin",NULL) == 1)) {
-					settings->flags |= STDIN;
+					settings->flags |= STATULA_STDIN;
 				} else if (argc - i > 0 && (is_valid_parameter(argv[i], "--help","-h") == 1)) {
-					settings->flags |= PRINT_HELP;
+					settings->flags |= STATULA_PRINT_HELP;
 				} else if (argc - i > 0 && (is_valid_parameter(argv[i], "--nosort",NULL) == 1)) {
-					settings->dataset_flags &= ~SORT;
+					settings->dataset_flags &= ~STATULA_SORT;
 				} else if (argc - i > 0 && (is_valid_parameter(argv[i], "--silent",NULL) == 1)) {
-					settings->flags &= ~PRINT_TO_STDOUT;
+					settings->flags &= ~STATULA_PRINT_TO_STDOUT;
 				} else if (argc - i > 1 && is_valid_parameter(argv[i],"--precision",NULL) == 1){
 					settings->precision = strtol(argv[i+1],NULL,10);
 					if(settings->precision<0){
-						settings->precision = DEFAULT_PRECISION;
+						settings->precision = STATULA_DEFAULT_PRECISION;
 					}
 					i++;
 				} else if (argc - i > 1 && (is_valid_parameter(argv[i], "--open","-o")==1)) {
@@ -269,37 +295,37 @@ struct settings *parse_cmd_args(int argc,char **argv)
 						}
 					}
 				} else {
-#ifdef TEST
+#ifdef STATULA_TESTS
 					return NULL;
 #else
 					print_help();
-					eprintf("\nInvalid starting parameter \"%s\"!\n\n", argv[i]);
+					eprintf(STATULA_FAIL_GENERAL,"\nInvalid starting parameter \"%s\"!\n\n", argv[i]);
 #endif
 				}
 			} else if (argc == 2 && is_argument(argv[1])==1) {
 				settings->input_files = malloc(sizeof(char *));
 				settings->input_files[0] = argv[1];
-				settings->in_file_count++;
+				settings->in_file_count = 1;
 			} else {
-#ifdef TEST
+#ifdef STATULA_TESTS
 				return NULL;
 #else
 				print_help();
-				eprintf("\nInvalid starting parameter \"%s\"!\n\n", argv[i]);
+				eprintf(STATULA_FAIL_GENERAL,"\nInvalid starting parameter \"%s\"!\n\n", argv[i]);
 #endif
 			}
 		}
 	} else if (argc == 1) {
-		settings->flags |= STDIN;
+		settings->flags |= STATULA_STDIN;
 	}
 	
 	settings->strings = init_strings(settings->language);
 	
 	if(!settings->strings){
-#ifdef TEST
+#ifdef STATULA_TESTS
 		return NULL;
 #else
-		eprintf("parse_cmd_args: Init strings fail:");
+		eprintf(STATULA_FAIL_GENERAL,"parse_cmd_args: Init strings fail:");
 #endif
 	}
 	

@@ -8,16 +8,16 @@ LDI =../lib
 
 LIBS=-lm -lcriterion
 
-_DEPS = operations.h io.h dataset.h misc.h 
+_DEPS = operations.h dataset.h io.h misc.h 
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 _OBJ = operations.o dataset.o io.o misc.o tests.o 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: %.c $(DEPS)
-	$(CC) -DTEST $< $(CFLAGS) -c -o $@ 
+	$(CC) -DSTATULA_TESTS $< $(CFLAGS) -c -o $@ 
 statula_tests: $(OBJ)
-	$(CC) -DTEST $^ $(CFLAGS) $(LIBS) -o $@ 
+	$(CC) -DSTATULA_TESTS $^ $(CFLAGS) $(LIBS) -o $@ 
 .PHONY: clean
 
 clean:
