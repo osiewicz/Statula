@@ -21,17 +21,21 @@ int main(int argc, char **argv)
 	
 	struct settings *settings = parse_cmd_args(argc,argv); 
 	
-	handle_flags(settings);
-	for (int i = 0; i < settings->in_file_count; i++) {
-		process_file(settings,i);
+	if(settings) {
+		handle_flags(settings);
+		for (int i = 0; i < settings->in_file_count; i++) {
+			process_file(settings,i);
+		}
+		
+		if ((settings->dataset_flags ^ STATULA_SORT) & STATULA_SORT) {
+			puts("\nWARNING: Median, mode and skewness could yield incorrect results due to the input not being sorted.\n");
+		}
+		
+		free_settings(settings);
+		
+		return 0;
+	} else {
+		return 1;
 	}
-	
-	if ((settings->dataset_flags ^ STATULA_SORT) & STATULA_SORT) {
-		puts("\nWARNING: Median, mode and skewness could yield incorrect results due to the input not being sorted.\n");
-	}
-	
-	free_settings(settings);
-	
-	return 0;
 }
 

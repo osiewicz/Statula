@@ -147,28 +147,32 @@ static FILE *open_lang_file(const char *language)
 	}
 	FILE *fp;
 	char *filename = malloc(sizeof(char) * (strlen(language) + 7*sizeof(char)));
-	memset(filename,0,sizeof(char)*strlen(language)+7*sizeof(char));
-	filename[0] = '.';
-	memcpy(filename + 1, language, strlen(language));
-	strncat(filename + strlen(language), ".lang", 5);
-	if (access(filename, F_OK) != -1) {
-		fp = fopen(filename, "r");
-		if (!fp) {
+	if(!filename) {
+		return NULL;
+	} else {
+		memset(filename,0,sizeof(char)*strlen(language)+7*sizeof(char));
+		filename[0] = '.';
+		memcpy(filename + 1, language, strlen(language));
+		strncat(filename + strlen(language), ".lang", 5);
+		if (access(filename, F_OK) != -1) {
+			fp = fopen(filename, "r");
+			if (!fp) {
+#ifdef STATULA_TESTS
+				return NULL;
+#else
+				eprintf(STATULA_FAIL_IO,"open_lang_file: Failed to open file .%s.lang:", language);
+#endif
+			}
+		} else {
 #ifdef STATULA_TESTS
 			return NULL;
 #else
-			eprintf(STATULA_FAIL_IO,"open_lang_file: Failed to open file .%s.lang:", language);
+			eprintf(STATULA_FAIL_IO,"open_lang_file: File \".%s.lang\" was not found:", language);
 #endif
 		}
-	} else {
-#ifdef STATULA_TESTS
-		return NULL;
-#else
-		eprintf(STATULA_FAIL_IO,"open_lang_file: File \".%s.lang\" was not found:", language);
-#endif
+		free(filename);
+		return fp;
 	}
-	free(filename);
-	return fp;
 }
 
 void *read_data(const char *source, unsigned long long *num_count, fpn *(*filter)(char *buffer, unsigned long long *num_count, fpn *numbers))
