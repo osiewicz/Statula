@@ -9,6 +9,15 @@
 #include <dataset.h>
 
 #define STATULA_BUFFER_SIZE 1024
+#define STATULA_LANG_FILE_EXT ".lang"
+
+#ifndef STATULA_MISC_DIR
+#define STATULA_MISC_DIR "./"
+#endif
+
+#ifndef STATULA_LANG_DIR_NAME
+#define STATULA_LANG_DIR_NAME "lang/"
+#endif
 
 #define STATULA_SUCCESS 0
 #define STATULA_FAIL_NULL 1

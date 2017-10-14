@@ -17,6 +17,10 @@ ifeq ($(prefix),)
 	prefix:=/usr/local
 endif
 
+ifeq ($(config),)
+	config:=/etc/statula/
+endif
+
 $(ODIR)/%.o: %.c $(DEPS) 
 	$(CC) $< $(CFLAGS) -c -o $@ 
 
@@ -25,11 +29,16 @@ statula: $(OBJ)
 .PHONY: clean reduced_precision
 
 reduced_precision: clean
-reduced_precision: CFLAGS+="-DREDUCED_PRECISION"
+reduced_precision: CFLAGS+="-DSTATULA_REDUCED_PRECISION"
 reduced_precision: statula
 
 clean:
 	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~
 
+install: clean
+install: CFLAGS+="-DSTATULA_MISC_DIR=\"$(config)\""
 install: statula
-	install -m 0755 statula $(prefix)/bin
+	mkdir $(config)
+	cp -r ./lang $(config)
+	install -m 0755 statula $(prefix)/bin/statula
+

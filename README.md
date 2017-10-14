@@ -3,7 +3,7 @@
 ***
 
 ### Simple terminal-based program for descriptive statistics
-##### *Current version: 0.1.14*
+##### *Current version: 0.1.15*
 [![Build Status](https://travis-ci.org/PiotrOsiewicz/Statula.svg?branch=master)](https://travis-ci.org/PiotrOsiewicz/Statula)
 [![license](https://img.shields.io/github/license/PiotrOsiewicz/statula.svg)]()
 

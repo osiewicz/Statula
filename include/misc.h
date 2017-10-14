@@ -1,6 +1,6 @@
 #pragma once
 
-#define STATULA_VERSION "v0.1.14"
+#define STATULA_VERSION "v0.1.15"
 
 //flags
 #define STATULA_PRINT_TO_STDOUT (1 << 0)

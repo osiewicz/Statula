@@ -26,17 +26,17 @@ char **load_strings(const char *language, int *count)
 	int i;
 	size_t max_line_size = 0;
 	fp = open_lang_file(language);
-	if (!fp) {
+	if (fp == NULL) {
 #ifdef STATULA_TESTS
 		return NULL;
 #else
 		eprintf(STATULA_FAIL_IO,"load_strings: Failed to open file \".%s.lang\":", language);
 #endif
 	}
-	for (i = 1; !feof(fp); i++) {
+	for (i = 1; feof(fp) == 0; i++) {
 		char **temp = NULL;
 		temp = realloc(text,sizeof(char*) * i);
-		if(!temp){
+		if(temp == NULL){
 #ifdef STATULA_TESTS
 			return NULL;
 #else
@@ -74,30 +74,36 @@ struct strings *init_strings(const char *language)
 #endif
 	}
 	struct strings *strings = malloc(sizeof(struct strings));
-	if(!strings){
+	if(strings == NULL){
 #ifdef STATULA_TESTS
 		return NULL;
 #else
 		eprintf(STATULA_FAIL_MEMORY,"init_strings: Memory allocation failed:");
 #endif
 	}
+	
+	if(strings->text != NULL){
+		free(strings->text);
+	}
+	
 	strings->language = NULL;
 	strings->line_count = 0;
 	
 	size_t target_len = strlen(language) + 1;
 	strings->language = malloc(sizeof(char)*target_len);
-	strncpy(strings->language,language,target_len);
-	strings->language[target_len - 1] = '\0';
-	
-	if(!strings->language){
+	if(strings->language == NULL){
 #ifdef STATULA_TESTS
 		return NULL;
 #else
 		eprintf(STATULA_FAIL_MEMORY,"init_strings: Memcpy fail:");
 #endif
 	}
+	
+	strncpy(strings->language,language,target_len);
+	strings->language[target_len - 1] = '\0';
+	
 	strings->text = load_strings(strings->language,&strings->line_count);
-	if(!strings->text){
+	if(strings->text == NULL){
 #ifdef STATULA_TESTS
 		return NULL;
 #else
@@ -130,11 +136,43 @@ int free_strings(struct strings *strings)
 	return STATULA_SUCCESS;
 }
 
+static char *get_language_dir_path(const char *language)
+{
+	/* Responsibilities:
+	 * Returns path to .lang file based on macros defined on compile-time.
+	 * Memory allocation responsibilities: Allocates memory.
+	 */
+	if(language == NULL){
+#ifdef STATULA_TESTS
+		return NULL;
+#else
+		eprintf(STATULA_FAIL_NULL,"get_language_dir_path: NULL pointer passed");
+#endif
+	}
+	size_t full_path_len = strlen(STATULA_MISC_DIR) + strlen(STATULA_LANG_DIR_NAME) + 
+				strlen(language) + strlen(STATULA_LANG_FILE_EXT) + 1;
+	// +1 for '\0'
+	char *full_path = malloc(full_path_len * sizeof(char));
+	if(full_path == NULL){
+#ifdef STATULA_TESTS
+		return NULL;
+#else
+		eprintf(STATULA_FAIL_MEMORY,"get_language_dir_path: Failed to allocate memory");
+#endif
+	}
+	memset(full_path, 0, full_path_len);
+	strcat(full_path, STATULA_MISC_DIR);
+	strcat(full_path, STATULA_LANG_DIR_NAME);
+	strcat(full_path, language);
+	strcat(full_path, STATULA_LANG_FILE_EXT);
+	
+	return full_path;
+}
+
 static FILE *open_lang_file(const char *language)
 {
 	/* Responsibilities:
-	 * Opens file for given language name (which consists of "."
-	 * + 'language' + ".lang").
+	 * Opens file for given language name (which consists of language' + ".lang").
 	 * Memory allocation responsibilities: None.
 	 */
 	
@@ -146,14 +184,17 @@ static FILE *open_lang_file(const char *language)
 #endif
 	}
 	FILE *fp;
-	char *filename = malloc(sizeof(char) * (strlen(language) + 7*sizeof(char)));
-	memset(filename,0,sizeof(char)*strlen(language)+7*sizeof(char));
-	filename[0] = '.';
-	memcpy(filename + 1, language, strlen(language));
-	strncat(filename + strlen(language), ".lang", 5);
+	char *filename = get_language_dir_path(language);
+	if(filename == NULL){
+#ifdef STATULA_TESTS
+		return NULL;
+#else
+		eprintf(STATULA_FAIL_MEMORY,"open_lang_file: Memory allocation failed.");
+#endif
+	}
 	if (access(filename, F_OK) != -1) {
 		fp = fopen(filename, "r");
-		if (!fp) {
+		if (fp == NULL) {
 #ifdef STATULA_TESTS
 			return NULL;
 #else
@@ -201,14 +242,14 @@ void *read_data(const char *source, unsigned long long *num_count, fpn *(*filter
 			numbers = malloc(sizeof(fpn) * STATULA_BUFFER_SIZE);
 			filter(NULL,NULL,NULL);//Reset memory counter in filter
 	
-			if (!numbers) {
+			if (numbers == NULL) {
 #ifdef STATULA_TESTS
 				return NULL;
 #else
 				eprintf(STATULA_FAIL_MEMORY,"read_data: Failed to allocate memory for data array:");
 #endif
 			}
-			while(!feof(fp)) {
+			while(feof(fp) == 0) {
 				size=0;
 				buffer=NULL;
 				if (getline(&buffer, &size, fp) > 0) {
