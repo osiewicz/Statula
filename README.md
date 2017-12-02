@@ -6,7 +6,7 @@
 ##### *Current version: 0.1.16*
 [![Build Status](https://travis-ci.org/PiotrOsiewicz/Statula.svg?branch=master)](https://travis-ci.org/PiotrOsiewicz/Statula)
 [![license](https://img.shields.io/github/license/PiotrOsiewicz/statula.svg)]()
-
+[![codecov](https://codecov.io/gh/PiotrOsiewicz/Statula/branch/master/graph/badge.svg)](https://codecov.io/gh/PiotrOsiewicz/Statula)
 Initially developed as a leeway from statistics exam, this small piece of software is supposed to allow quick data analysis of big datasets.
 The main focus of this project is speed.
 
