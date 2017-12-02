@@ -82,10 +82,7 @@ struct strings *init_strings(const char *language)
 #endif
 	}
 	
-	if(strings->text != NULL){
-		free(strings->text);
-	}
-	
+	strings->text = NULL;
 	strings->language = NULL;
 	strings->line_count = 0;
 	
@@ -129,10 +126,14 @@ int free_strings(struct strings *strings)
 	
 	for(int i=0;i<strings->line_count;i++){
 		free(strings->text[i]);
+		strings->text[i] = NULL;
 	}
 	free(strings->text);
 	free(strings->language);
+	strings->text = NULL;
+	strings->language = NULL;
 	free(strings);
+	strings = NULL;
 	return STATULA_SUCCESS;
 }
 

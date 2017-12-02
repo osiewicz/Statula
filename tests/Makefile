@@ -1,6 +1,6 @@
 IDIR =../include
 CC=gcc
-CFLAGS=-I$(IDIR) -std=c99
+CFLAGS=-I$(IDIR) -std=c99 -coverage
 VPATH=../src
 
 ODIR=../tests/obj

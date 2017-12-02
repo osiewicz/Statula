@@ -3,6 +3,16 @@
 
 static long long int fact_iter(int counter, const int target, long long int accumulator);
 
+static double statula_pow(double base,unsigned long long exponent)
+{
+	double result = 1;
+	while(exponent > 0){
+		result *= base;
+		exponent--;
+	}
+	return result;
+}
+
 int mean(struct dataset *set)
 {
 	/* Responsibilities:
@@ -174,7 +184,7 @@ int central_moment(struct dataset *set, int degree)
 	double c_moment = 0;
 	
 	for (int i = 0; i < set->number_count; i++) {
-		c_moment += pow((set->numbers[i] - set->mean), degree);
+		c_moment += statula_pow((set->numbers[i] - set->mean), degree);
 	}
 	c_moment /= set->number_count;
 	if (degree == 2) {
@@ -289,7 +299,7 @@ int kurtosis(struct dataset *set)
 	if (set->std_deviation == 0) {
 		return STATULA_FAIL_MATH;
 	}
-	set->kurtosis = set->kurtosis / pow(set->std_deviation, 4) - 3;
+	set->kurtosis = set->kurtosis / statula_pow(set->std_deviation, 4) - 3;
 	return STATULA_SUCCESS;
 }
 

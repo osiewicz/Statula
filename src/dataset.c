@@ -74,6 +74,8 @@ static int set_defaults_dataset(struct dataset *set)
 {
 	/* Responsibilities:
 	 * Sets set struct to default values.
+	 * CAUTION: does not try to free set->numbers - you have to do it
+	 * yourself if this function is not used in init context.
 	 * Memory allocation responsibilites: None.
 	 */
 	
