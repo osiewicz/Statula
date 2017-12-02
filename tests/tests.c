@@ -118,6 +118,28 @@ Test(dataset,2)
 	free_dataset(test);
 }
 
+Test(free_dataset,NULLpointer)
+{
+	cr_assert(free_dataset(NULL) == STATULA_FAIL_NULL);
+}
+
+Test(free_dataset,Valid)
+{
+	struct dataset *test = malloc(sizeof(struct dataset));
+	init_dataset(test, STATULA_SORT, "datasets/test_0");
+	cr_assert(free_dataset(test) == STATULA_SUCCESS);
+}
+Test(compute_dataset,NULLpointer)
+{
+	cr_assert(compute_dataset(NULL) == STATULA_FAIL_NULL);
+}
+
+Test(compute_dataset,Valid)
+{
+	struct dataset *test = malloc(sizeof(struct dataset));
+	init_dataset(test, STATULA_SORT, "datasets/test_0");
+	cr_assert(compute_dataset(test) == STATULA_SUCCESS);
+}
 /* io.c tests */
 
 Test(load_strings,MissingFile)
@@ -167,6 +189,15 @@ Test(print_dataset,NULLptr)
 }
 
 /* misc.c tests */
+
+Test(proccess_file,InvalidArguments)
+{
+	cr_assert(process_file(NULL,0) == STATULA_FAIL_NULL);
+	struct settings *settings = init_settings();
+	cr_assert(process_file(settings,-3) == STATULA_FAIL_GENERAL);
+	cr_assert(process_file(settings,(1<<30)) == STATULA_FAIL_GENERAL);//out of bounds
+	free_settings(settings);
+}
 
 Test(enable_stdin,NULLptr)
 {
@@ -231,5 +262,10 @@ Test(is_argument,Suite)
 
 Test(eprintf,NULLptr)
 {
-//	cr_assert(eprintf(NULL) == 1);
+	cr_assert(eprintf(0,NULL) == STATULA_FAIL_NULL);
+}
+
+Test(eprintf,Valid)
+{
+	cr_assert(eprintf(STATULA_FAIL_GENERAL,"Just mocking") == STATULA_SUCCESS);
 }

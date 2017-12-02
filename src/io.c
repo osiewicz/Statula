@@ -294,6 +294,7 @@ unsigned eprintf(unsigned err_code, char *fmt, ...)
 #endif
 	}
 	
+#ifndef STATULA_TESTS
 	va_list args;
 	fflush(stdout);
 	fprintf(stderr, "%s : Error code %u", progname, err_code);
@@ -305,5 +306,7 @@ unsigned eprintf(unsigned err_code, char *fmt, ...)
 	}
 	fprintf(stderr, "\n");
 	exit(err_code);
+#endif
+	return STATULA_SUCCESS;
 }
 
